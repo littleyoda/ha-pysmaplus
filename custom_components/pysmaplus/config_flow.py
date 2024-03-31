@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import pysmaimport pysmaplus as pysma
+import pysmaplus as pysma
 import voluptuous as vol
 
 from homeassistant import config_entries, core
