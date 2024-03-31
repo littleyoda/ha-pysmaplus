@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pysma
+import pysmaplus as pysma
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
