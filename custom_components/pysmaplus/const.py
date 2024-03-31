@@ -1,7 +1,7 @@
 """Constants for the sma integration."""
 from homeassistant.const import Platform
 
-DOMAIN = "lysma2"
+DOMAIN = "pysmaplus"
 
 PYSMA_COORDINATOR = "coordinator"
 PYSMA_OBJECT = "pysma"

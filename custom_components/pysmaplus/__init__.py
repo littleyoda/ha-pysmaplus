@@ -93,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
-        name="lysma2",
+        name="pysmaplus",
         update_method=async_update_data,
         update_interval=interval,
     )
