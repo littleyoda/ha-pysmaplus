@@ -1,4 +1,4 @@
 {
-  "name": "custom_components/pysmaplus/manifest.json ",
+  "name": "SMA Devices Plus (not for production use)",
   "domains": ["sensor"]
 }
