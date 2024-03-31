@@ -1,0 +1,12 @@
+{
+  "domain": "pysmaplus",
+  "name": "SMA Solar extended by ly (not for production use)",
+  "codeowners": ["@littleyoda", "@kellerza", "@rklomp"],
+  "config_flow": true,
+  "documentation": "https://github.com/littleyoda/pysma/tree/tripowerX",
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "loggers": ["pysma"],
+  "requirements": ["pysma-plus>0.0.1"],
+  "version": "0.0.1"
+}

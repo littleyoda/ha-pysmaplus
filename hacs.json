@@ -1,0 +1,4 @@
+{
+  "name": "custom_components/pysmaplus/manifest.json ",
+  "domains": ["sensor"]
+}
