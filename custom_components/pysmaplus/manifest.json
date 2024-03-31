@@ -1,6 +1,6 @@
 {
   "domain": "pysmaplus",
-  "name": "SMA Solar extended by ly (not for production use)",
+  "name": "SMA Devices Plus (not for production use)",
   "codeowners": ["@littleyoda", "@kellerza", "@rklomp"],
   "config_flow": true,
   "documentation": "https://github.com/littleyoda/pysma/tree/tripowerX",
