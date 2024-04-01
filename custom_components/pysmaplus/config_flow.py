@@ -62,7 +62,6 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.config_data = {}
         errors = {}
         if user_input is not None:
-            _LOGGER.exception(user_input)
             deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
             if deviceIdx in [0,1]:
                 self.config_data.update(user_input)
@@ -94,7 +93,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     await self.async_set_unique_id(device_info["serial"])
                     self._abort_if_unique_id_configured(updates=self._data)
                     return self.async_create_entry(
-                        title=device_info["serial"], data=self._data
+                        title=device_info["name"] + " (" + str(device_info["serial"]) + ")", data=self._data
                     )
 
         data_schema=vol.Schema(
@@ -137,7 +136,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(device_info["serial"])
                 self._abort_if_unique_id_configured(updates=self._data)
                 return self.async_create_entry(
-                    title=self._data[CONF_HOST], data=self._data
+                    title=device_info["name"] + " (" + self._data[CONF_HOST] + ")", data=self._data
                 )
             
         if (deviceIdx == 0):
@@ -153,7 +152,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ),
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
-            )
+                )
         elif (deviceIdx == 1):
             data_schema=vol.Schema(
                 {
