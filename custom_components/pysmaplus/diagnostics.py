@@ -16,7 +16,7 @@ from .const import (
 
 
 
-REDACT_KEYS = {"host"}
+REDACT_KEYS = {"host", "password"}
 
 async def getDevices(hass: HomeAssistant, entry_id: str):
     devices = []
