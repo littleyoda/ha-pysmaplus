@@ -41,16 +41,19 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sma from a config entry."""
     # Init the SMA interface
-    protocol = "https" if entry.data[CONF_SSL] else "http"
-    url = f"{protocol}://{entry.data[CONF_HOST]}"
-    verify_ssl = entry.data[CONF_VERIFY_SSL]
-  #  group = entry.data[CONF_GROUP]
-    #password = entry.data[CONF_PASSWORD]
 
-    session = async_get_clientsession(hass, verify_ssl=verify_ssl)
+    session = None
+    if entry.data[CONF_ACCESS] == "speedwireinv":
+        url = entry.data[CONF_HOST]
+    elif CONF_SSL in entry.data and CONF_HOST in entry.data:
+        protocol = "https" if entry.data[CONF_SSL] else "http"
+        url = f"{protocol}://{entry.data[CONF_HOST]}"
+        session = async_get_clientsession(hass, verify_ssl=entry.data[CONF_VERIFY_SSL])
     am = entry.data[CONF_ACCESS]
     if (am == "speedwire"):
         am = "speedwireem"
+
+    _LOGGER.debug(f"Setup Entry => URL: {url} User: {entry.data[CONF_GROUP]} Method: {am}")
     sma = pysma.getDevice(session, url, password = entry.data[CONF_PASSWORD], groupuser = entry.data[CONF_GROUP], accessmethod = am)
 #    sma = pysma.SMA(session, url, password, group)
     try:

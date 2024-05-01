@@ -24,13 +24,16 @@ async def validate_input(
     """Validate the user input allows us to connect."""
     url = None
     session = None
-    if CONF_SSL in data and CONF_HOST in data:
+    if data[CONF_ACCESS] == "speedwireinv":
+        url = data[CONF_HOST]
+    elif CONF_SSL in data and CONF_HOST in data:
         protocol = "https" if data[CONF_SSL] else "http"
         url = f"{protocol}://{data[CONF_HOST]}"
         session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
     am = data[CONF_ACCESS]
     if (am == "speedwire"):
         am = "speedwireem"
+    _LOGGER.debug(f"Validate URL: {url} User: {data[CONF_GROUP]} Method: {am}")
     sma = pysma.getDevice(session, url, password = data[CONF_PASSWORD], groupuser = data[CONF_GROUP], accessmethod = am)
     #sma = pysma.SMA(session, url, data[CONF_PASSWORD], group=data[CONF_GROUP])
 
