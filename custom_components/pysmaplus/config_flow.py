@@ -28,7 +28,10 @@ async def validate_input(
         protocol = "https" if data[CONF_SSL] else "http"
         url = f"{protocol}://{data[CONF_HOST]}"
         session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
-    sma = pysma.getDevice(session, url, password = data[CONF_PASSWORD], groupuser = data[CONF_GROUP], accessmethod = data[CONF_ACCESS])
+    am = data[CONF_ACCESS]
+    if (am == "speedwire"):
+        am = "speedwireem"
+    sma = pysma.getDevice(session, url, password = data[CONF_PASSWORD], groupuser = data[CONF_GROUP], accessmethod = am)
     #sma = pysma.SMA(session, url, data[CONF_PASSWORD], group=data[CONF_GROUP])
 
     # new_session raises SmaAuthenticationException on failure
@@ -63,12 +66,12 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
-            if deviceIdx in [0,1]:
+            if deviceIdx in [0,1,2]:
                 self.config_data.update(user_input)
                 # Return the form of the next step
                 return await self.async_step_details()
 
-            if deviceIdx == 2:
+            if deviceIdx == 3:
                 # EM/SHM2 do not require any further parameters.
                 self._data[CONF_HOST] = "localhost"
                 self._data[CONF_SSL] = False
@@ -139,7 +142,18 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=device_info["name"] + " (" + self._data[CONF_HOST] + ")", data=self._data
                 )
             
+
         if (deviceIdx == 0):
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
+                    vol.Required(CONF_GROUP, default=self._data[CONF_GROUP]): vol.In(
+                        GROUPS
+                    ),
+                    vol.Required(CONF_PASSWORD): cv.string,
+                }
+                )
+        if (deviceIdx == 1):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
@@ -153,7 +167,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
                 )
-        elif (deviceIdx == 1):
+        elif (deviceIdx == 2):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,

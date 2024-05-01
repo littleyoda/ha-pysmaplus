@@ -48,7 +48,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     #password = entry.data[CONF_PASSWORD]
 
     session = async_get_clientsession(hass, verify_ssl=verify_ssl)
-    sma = pysma.getDevice(session, url, password = entry.data[CONF_PASSWORD], groupuser = entry.data[CONF_GROUP], accessmethod = entry.data[CONF_ACCESS])
+    am = entry.data[CONF_ACCESS]
+    if (am == "speedwire"):
+        am = "speedwireem"
+    sma = pysma.getDevice(session, url, password = entry.data[CONF_PASSWORD], groupuser = entry.data[CONF_GROUP], accessmethod = am)
 #    sma = pysma.SMA(session, url, password, group)
     try:
         await sma.new_session()

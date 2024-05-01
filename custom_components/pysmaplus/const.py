@@ -18,6 +18,6 @@ CONF_ACCESSLONG = "accesslong"
 DEFAULT_SCAN_INTERVAL = 5
   
 GROUPS = ["user", "installer"]
-ACCESS = ["webconnect", "ennexos", "speedwire"]
-ACCESSLONG = ["SMA Devices with Webconnect", "SMA Devices with EnnexOS (e.g. Tripower X Serie)", "SMA Energy Meter / Sunny Home Manager 2.0"]
+ACCESS = ["speedwireinv", "webconnect", "ennexos", "speedwireem"]
+ACCESSLONG = ["SMA Devices with Speedwire", "SMA Devices with Webconnect", "SMA Devices with EnnexOS (e.g. Tripower X Serie)", "SMA Energy Meter / Sunny Home Manager 2.0"]
 
