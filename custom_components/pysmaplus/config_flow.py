@@ -156,7 +156,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
                 )
-        if (deviceIdx == 1):
+        elif (deviceIdx == 1):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,

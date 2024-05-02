@@ -73,7 +73,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Create DeviceInfo object from sma_device_info
     device_info = DeviceInfo(
-        configuration_url=url,
+#        configuration_url=url,
+        configuration_url=None,
         identifiers={(DOMAIN, entry.unique_id)},
         manufacturer=sma_device_info["manufacturer"],
         model=sma_device_info["type"],

@@ -869,15 +869,16 @@ async def async_setup_entry(
 
     entities = []
     for sensor in used_sensors:
-        entities.append(
-            SMAsensor(
-                coordinator,
-                config_entry.unique_id,
-                SENSOR_ENTITIES.get(sensor.name),
-                device_info,
-                sensor,
+        if sensor.name in SENSOR_ENTITIES:
+            entities.append(
+                SMAsensor(
+                    coordinator,
+                    config_entry.unique_id,
+                    SENSOR_ENTITIES.get(sensor.name),
+                    device_info,
+                    sensor,
+                )
             )
-        )
 
     async_add_entities(entities)
 
