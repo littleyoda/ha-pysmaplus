@@ -139,7 +139,10 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
 
             if not errors:
-                await self.async_set_unique_id(device_info["serial"])
+                serial = device_info["serial"]
+                if (serial == 0):
+                    serial = self._data[CONF_HOST]
+                await self.async_set_unique_id(serial)
                 self._abort_if_unique_id_configured(updates=self._data)
                 return self.async_create_entry(
                     title=device_info["name"] + " (" + self._data[CONF_HOST] + ")", data=self._data
