@@ -7,6 +7,6 @@
   "iot_class": "local_polling",
   "integration_type": "device",
   "loggers": ["pysma"],
-  "requirements": ["pysma-plus>=0.2.3"],
-  "version": "0.2.2"
+  "requirements": ["pysma-plus>=0.2.4"],
+  "version": "0.2.3"
 }
