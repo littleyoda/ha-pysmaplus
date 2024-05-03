@@ -2,5 +2,6 @@
   "name": "SMA Devices Plus (not for production use)",
   "domains": ["sensor"],
   "zip_release": true,
+  "render_readme": true,
   "filename": "ha-pysmaplus.zip"
 }
