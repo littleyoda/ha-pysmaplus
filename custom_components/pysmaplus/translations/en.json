@@ -11,7 +11,17 @@
             "unknown": "Unexpected error"
         },
         "step": {
-            "details": {
+            "user": {
+                "data": {
+                    "accesslong": "Interface"
+                },
+                "data_description": {
+                    "host": "The hostname or IP address of your SMA device."
+                },
+                "description": "## Webconnect\nDevices that supports the webconnect standard. Many SMA devices from end of 2014 to 2023. (e.g. Sunny Tripower Smart Energy, Sunny Boy Storage)\n\n## EnnoxOS\nNewer devices from SMA from approx. 2023. (e.g. Tripower X, EVCharger)\n\n## Speedwire Energymeter\nSunny Home Manager 2 as well Energymeter 10/20\n\n## Speedwire\nAlmost all SMA devices with a network connection. Only unencrypted communication is supported. The password for the account \"user\" can be set using the Sunny Explorer Software",
+                "title": "Set up SMA Solar"
+          },
+          "details": {
                 "data": {
                     "group": "Group",
                     "host": "Host",
@@ -20,27 +30,11 @@
                     "verify_ssl": "Verify SSL certificate"
                 },
                 "data_description": {
-                    "host": "The hostname or IP address of your SMA device."
+                    "host": "The hostname or IP address of your SMA device. 123"
                 },
                 "description": "Enter your SMA device information.",
-                "title": "Set up SMA Solar"
-            },
-            "user": {
-              "details": {
-                  "data": {
-                      "group": "Group",
-                      "host": "Host",
-                      "password": "Password",
-                      "ssl": "Uses an SSL certificate",
-                      "verify_ssl": "Verify SSL certificate"
-                  },
-                  "data_description": {
-                      "host": "The hostname or IP address of your SMA device."
-                  },
-                  "description": "Enter your SMA device information.",
-                  "title": "Set up SMA Solar"
-              }
-          }
+                "title": "Set up SMA Solar 123"
+            }
       }
   }
 }

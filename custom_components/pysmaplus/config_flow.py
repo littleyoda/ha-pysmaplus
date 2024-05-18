@@ -67,48 +67,49 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """First step in config flow."""
         self.config_data = {}
         errors = {}
-        if user_input is not None:
-            deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
-            if deviceIdx in [0,1,2]:
-                self.config_data.update(user_input)
-                # Return the form of the next step
-                return await self.async_step_details()
+        if user_input is None:
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ACCESSLONG, default=ACCESSLONG[ACCESS.index(self._data[CONF_ACCESS])]): vol.In(
+                        ACCESSLONG
+                    ),
+                })
+            return self.async_show_form(step_id="user", data_schema = data_schema, errors=errors)
 
-            if deviceIdx == 3:
-                # EM/SHM2 do not require any further parameters.
-                self._data[CONF_HOST] = "localhost"
-                self._data[CONF_SSL] = False
-                self._data[CONF_VERIFY_SSL] = False
-                self._data[CONF_GROUP] = ""
-                self._data[CONF_PASSWORD] = ""
-                self._data[CONF_ACCESS] = ACCESS[deviceIdx]
+        deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
+        if deviceIdx in [0,1,2]:
+            self.config_data.update(user_input)
+            # Return the form of the next step
+            return await self.async_step_details()
 
-                try:
-                    device_info = await validate_input(self.hass, self._data)
-                except pysma.exceptions.SmaConnectionException:
-                    errors["base"] = "cannot_connect"
-                except pysma.exceptions.SmaAuthenticationException:
-                    errors["base"] = "invalid_auth"
-                except pysma.exceptions.SmaReadException:
-                    errors["base"] = "cannot_retrieve_device_info"
-                except Exception:  # pylint: disable=broad-except
-                    _LOGGER.exception("Unexpected exception")
-                    errors["base"] = "unknown"
+        if deviceIdx == 3:
+            # EM/SHM2 do not require any further parameters.
+            self._data[CONF_HOST] = "localhost"
+            self._data[CONF_SSL] = False
+            self._data[CONF_VERIFY_SSL] = False
+            self._data[CONF_GROUP] = ""
+            self._data[CONF_PASSWORD] = ""
+            self._data[CONF_ACCESS] = ACCESS[deviceIdx]
 
-                if not errors:
-                    await self.async_set_unique_id(device_info["serial"])
-                    self._abort_if_unique_id_configured(updates=self._data)
-                    return self.async_create_entry(
-                        title=device_info["name"] + " (" + str(device_info["serial"]) + ")", data=self._data
-                    )
+            try:
+                device_info = await validate_input(self.hass, self._data)
+            except pysma.exceptions.SmaConnectionException:
+                errors["base"] = "cannot_connect"
+            except pysma.exceptions.SmaAuthenticationException:
+                errors["base"] = "invalid_auth"
+            except pysma.exceptions.SmaReadException:
+                errors["base"] = "cannot_retrieve_device_info"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
 
-        data_schema=vol.Schema(
-            {
-                vol.Required(CONF_ACCESSLONG, default=ACCESSLONG[ACCESS.index(self._data[CONF_ACCESS])]): vol.In(
-                    ACCESSLONG
-                ),
-            })
-        return self.async_show_form(step_id="user", data_schema = data_schema, errors=errors)
+            if not errors:
+                await self.async_set_unique_id(device_info["serial"])
+                self._abort_if_unique_id_configured(updates=self._data)
+                return self.async_create_entry(
+                    title=device_info["name"] + " (" + str(device_info["serial"]) + ")", data=self._data
+                )
+
     
 
     async def async_step_details(
