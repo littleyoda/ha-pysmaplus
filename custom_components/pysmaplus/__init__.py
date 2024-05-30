@@ -1,4 +1,5 @@
 """The sma integration."""
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -21,6 +22,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from .services import setup_services
 
 from .const import (
     CONF_GROUP,
@@ -33,6 +35,7 @@ from .const import (
     PYSMA_OBJECT,
     PYSMA_REMOVE_LISTENER,
     PYSMA_SENSORS,
+    PYSMA_ENTITIES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -50,12 +53,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         url = f"{protocol}://{entry.data[CONF_HOST]}"
         session = async_get_clientsession(hass, verify_ssl=entry.data[CONF_VERIFY_SSL])
     am = entry.data[CONF_ACCESS]
-    if (am == "speedwire"):
+    if am == "speedwire":
         am = "speedwireem"
 
-    _LOGGER.debug(f"Setup Entry => URL: {url} User: {entry.data[CONF_GROUP]} Method: {am}")
-    sma = pysma.getDevice(session, url, password = entry.data[CONF_PASSWORD], groupuser = entry.data[CONF_GROUP], accessmethod = am)
-#    sma = pysma.SMA(session, url, password, group)
+    _LOGGER.debug(
+        f"Setup Entry => URL: {url} User: {entry.data[CONF_GROUP]} Method: {am}"
+    )
+    sma = pysma.getDevice(
+        session,
+        url,
+        password=entry.data[CONF_PASSWORD],
+        groupuser=entry.data[CONF_GROUP],
+        accessmethod=am,
+    )
+
     try:
         await sma.new_session()
         # Get updated device info
@@ -73,7 +84,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Create DeviceInfo object from sma_device_info
     device_info = DeviceInfo(
-#        configuration_url=url,
+        #        configuration_url=url,
         configuration_url=None,
         identifiers={(DOMAIN, entry.unique_id)},
         manufacturer=sma_device_info["manufacturer"],
@@ -127,9 +138,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         PYSMA_SENSORS: sensor_def,
         PYSMA_REMOVE_LISTENER: remove_stop_listener,
         PYSMA_DEVICE_INFO: device_info,
+        PYSMA_ENTITIES: [],
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    setup_services(hass)
 
     return True
 

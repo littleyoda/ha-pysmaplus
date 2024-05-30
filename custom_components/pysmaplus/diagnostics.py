@@ -15,8 +15,8 @@ from .const import (
 )
 
 
-
 REDACT_KEYS = {"host", "password", "group"}
+
 
 async def getDevices(hass: HomeAssistant, entry_id: str):
     devices = []
@@ -24,9 +24,7 @@ async def getDevices(hass: HomeAssistant, entry_id: str):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
 
-    registry_devices = dr.async_entries_for_config_entry(
-        device_registry, entry_id
-    )
+    registry_devices = dr.async_entries_for_config_entry(device_registry, entry_id)
 
     for device in registry_devices:
         entities = []
@@ -48,6 +46,7 @@ async def getDevices(hass: HomeAssistant, entry_id: str):
         devices.append({"device": asdict(device), "entities": entities})
     return devices
 
+
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, config_entry: ConfigEntry
 ) -> dict[str, Any]:
@@ -59,6 +58,6 @@ async def async_get_config_entry_diagnostics(
     diag["config"] = config_entry.as_dict()
     diag["device_info"] = details["device_info"]
     diag["devices"] = await getDevices(hass, entry_id)
-    diag["values"] =await  details[PYSMA_OBJECT].get_debug()
+    diag["values"] = await details[PYSMA_OBJECT].get_debug()
 
     return async_redact_data(diag, REDACT_KEYS)

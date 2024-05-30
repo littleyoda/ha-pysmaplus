@@ -1,0 +1,27 @@
+set_value:
+  # target:
+  #   entity:
+  #     integration: pysmaplus
+  fields:
+     entity_id:
+        required: true
+        selector:
+          entity:
+            integration: pysmaplus
+     value:
+        required: true
+        selector:
+          number:
+      # selector:
+      #   object:
+
+get_value_range:
+  # target:
+  #   entity:
+  #     integration: pysmaplus
+  fields:
+     entity_id:
+        required: true
+        selector:
+          entity:
+            integration: pysmaplus

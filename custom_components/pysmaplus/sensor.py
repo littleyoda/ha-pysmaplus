@@ -1,4 +1,5 @@
 """SMA Solar Webconnect interface."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -33,7 +34,13 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import DOMAIN, PYSMA_COORDINATOR, PYSMA_DEVICE_INFO, PYSMA_SENSORS
+from .const import (
+    DOMAIN,
+    PYSMA_COORDINATOR,
+    PYSMA_DEVICE_INFO,
+    PYSMA_SENSORS,
+    PYSMA_ENTITIES,
+)
 
 SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "status": SensorEntityDescription(
@@ -44,13 +51,13 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "operating_status_general": SensorEntityDescription(
         key="operating_status_general",
         name="Operating Status General",
-        entity_registry_enabled_default=True,
+        entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     "inverter_condition": SensorEntityDescription(
         key="inverter_condition",
         name="Inverter Condition",
-        entity_registry_enabled_default=True,
+        entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     "inverter_system_init": SensorEntityDescription(
@@ -62,7 +69,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "grid_connection_status": SensorEntityDescription(
         key="grid_connection_status",
         name="Grid Connection Status",
-        entity_registry_enabled_default=True,
+        entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     "grid_relay_status": SensorEntityDescription(
@@ -91,6 +98,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=False,
     ),
     "pv_voltage_a": SensorEntityDescription(
         key="pv_voltage_a",
@@ -98,6 +106,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "pv_voltage_b": SensorEntityDescription(
         key="pv_voltage_b",
@@ -105,6 +114,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "pv_voltage_c": SensorEntityDescription(
         key="pv_voltage_c",
@@ -112,6 +122,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "pv_current_a": SensorEntityDescription(
         key="pv_current_a",
@@ -119,7 +130,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "pv_current_b": SensorEntityDescription(
         key="pv_current_b",
@@ -127,7 +137,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "pv_current_c": SensorEntityDescription(
         key="pv_current_c",
@@ -180,6 +189,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=False,
     ),
     "power_l2": SensorEntityDescription(
         key="power_l2",
@@ -187,6 +197,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=False,
     ),
     "power_l3": SensorEntityDescription(
         key="power_l3",
@@ -194,6 +205,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=False,
     ),
     "grid_reactive_power": SensorEntityDescription(
         key="grid_reactive_power",
@@ -309,6 +321,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "voltage_l2": SensorEntityDescription(
         key="voltage_l2",
@@ -316,6 +329,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "voltage_l3": SensorEntityDescription(
         key="voltage_l3",
@@ -323,6 +337,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "total_yield": SensorEntityDescription(
         key="total_yield",
@@ -344,6 +359,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
+        entity_registry_enabled_default=True,
     ),
     "temp_b": SensorEntityDescription(
         key="temp_b",
@@ -351,6 +367,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
+        entity_registry_enabled_default=True,
     ),
     "temp_c": SensorEntityDescription(
         key="temp_c",
@@ -358,6 +375,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
+        entity_registry_enabled_default=True,
     ),
     "metering_power_supplied": SensorEntityDescription(
         key="metering_power_supplied",
@@ -379,7 +397,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.FREQUENCY,
-        entity_registry_enabled_default=False,
     ),
     "metering_total_yield": SensorEntityDescription(
         key="metering_total_yield",
@@ -401,7 +418,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "metering_current_l2": SensorEntityDescription(
         key="metering_current_l2",
@@ -409,7 +425,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "metering_current_l3": SensorEntityDescription(
         key="metering_current_l3",
@@ -417,7 +432,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "metering_voltage_l1": SensorEntityDescription(
         key="metering_voltage_l1",
@@ -425,6 +439,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "metering_voltage_l2": SensorEntityDescription(
         key="metering_voltage_l2",
@@ -432,6 +447,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "metering_voltage_l3": SensorEntityDescription(
         key="metering_voltage_l3",
@@ -439,6 +455,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.VOLTAGE,
+        entity_registry_enabled_default=False,
     ),
     "metering_active_power_feed_l1": SensorEntityDescription(
         key="metering_active_power_feed_l1",
@@ -496,6 +513,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
+        entity_registry_enabled_default=False,
     ),
     "pv_gen_meter": SensorEntityDescription(
         key="pv_gen_meter",
@@ -620,7 +638,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "battery_current_b": SensorEntityDescription(
         key="battery_current_b",
@@ -628,7 +645,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "battery_current_c": SensorEntityDescription(
         key="battery_current_c",
@@ -636,7 +652,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-        entity_registry_enabled_default=False,
     ),
     "battery_temp_a": SensorEntityDescription(
         key="battery_temp_a",
@@ -873,6 +888,7 @@ async def async_setup_entry(
             )
 
     async_add_entities(entities)
+    sma_data[PYSMA_ENTITIES] = entities
 
 
 class SMAsensor(CoordinatorEntity, SensorEntity):

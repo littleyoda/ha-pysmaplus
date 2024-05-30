@@ -30,10 +30,10 @@
                     "verify_ssl": "Verify SSL certificate"
                 },
                 "data_description": {
-                    "host": "The hostname or IP address of your SMA device. 123"
+                    "host": "The hostname or IP address of your SMA device."
                 },
                 "description": "Enter your SMA device information.",
-                "title": "Set up SMA Solar 123"
+                "title": "Set up SMA Solar"
             }
       }
   }
