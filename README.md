@@ -24,7 +24,7 @@ Geräte: Energymeter + Sunny Home Manager 2
 # Speedwire
 Fast alle(?) SMA Geräte unterstützen standardmäßig die Kommunikation per Speedwire. Dieses Protokoll ist aber nicht offen gelegt und ein paar Personen haben versucht, zumindest die unverschlüsselte Version des Protokolls zu dekodieren.
 
-Voraussetzungen: Die Speedwire-Verschlüsselung darf nicht aktiviert werden. Außerdem kann es notwendig sein mit Hilfe des Sunny explorers das Password für den "user" Benutzer zu ändern. Defaultmäßig ist dieser auf 0000 eingestellt.
+Voraussetzungen: Die Speedwire-Verschlüsselung darf nicht aktiviert werden. Defaultmäßig ist dieser für die Gruppe User auf 0000 und für die Grupper Installer auf 1111 eingestellt.
 
 Geräte: alle, insbesondere Geräte, die von den anderen Interfaces nicht unterstützt werden z.B. Sunny Island
 
