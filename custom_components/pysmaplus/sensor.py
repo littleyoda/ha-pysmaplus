@@ -127,6 +127,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "pv_current_a": SensorEntityDescription(
         key="pv_current_a",
         name="PV Current A",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -134,6 +135,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "pv_current_b": SensorEntityDescription(
         key="pv_current_b",
         name="PV Current B",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -141,6 +143,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "pv_current_c": SensorEntityDescription(
         key="pv_current_c",
         name="PV Current C",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -178,6 +181,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "frequency": SensorEntityDescription(
         key="frequency",
         name="Frequency",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.FREQUENCY,
@@ -287,6 +291,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "current_l1": SensorEntityDescription(
         key="current_l1",
         name="Current L1",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -295,6 +300,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "current_l2": SensorEntityDescription(
         key="current_l2",
         name="Current L2",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -303,6 +309,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "current_l3": SensorEntityDescription(
         key="current_l3",
         name="Current L3",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -311,6 +318,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "current_total": SensorEntityDescription(
         key="current_total",
         name="Current Total",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -342,6 +350,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "total_yield": SensorEntityDescription(
         key="total_yield",
         name="Total Yield",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -349,6 +358,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "daily_yield": SensorEntityDescription(
         key="daily_yield",
         name="Daily Yield",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -356,26 +366,26 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "temp_a": SensorEntityDescription(
         key="temp_a",
         name="Temp A",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
-        entity_registry_enabled_default=True,
     ),
     "temp_b": SensorEntityDescription(
         key="temp_b",
         name="Temp B",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
-        entity_registry_enabled_default=True,
     ),
     "temp_c": SensorEntityDescription(
         key="temp_c",
         name="Temp C",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
-        entity_registry_enabled_default=True,
     ),
     "metering_power_supplied": SensorEntityDescription(
         key="metering_power_supplied",
@@ -394,6 +404,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_frequency": SensorEntityDescription(
         key="metering_frequency",
         name="Metering Frequency",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.FREQUENCY,
@@ -401,6 +412,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_total_yield": SensorEntityDescription(
         key="metering_total_yield",
         name="Metering Total Yield",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -408,6 +420,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_total_absorbed": SensorEntityDescription(
         key="metering_total_absorbed",
         name="Metering Total Absorbed",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -415,6 +428,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_current_l1": SensorEntityDescription(
         key="metering_current_l1",
         name="Metering Current L1",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -422,6 +436,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_current_l2": SensorEntityDescription(
         key="metering_current_l2",
         name="Metering Current L2",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -429,6 +444,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_current_l3": SensorEntityDescription(
         key="metering_current_l3",
         name="Metering Current L3",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -510,6 +526,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "metering_total_consumption": SensorEntityDescription(
         key="metering_total_consumption",
         name="Metering Total Consumption",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -518,6 +535,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "pv_gen_meter": SensorEntityDescription(
         key="pv_gen_meter",
         name="PV Gen Meter",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -533,6 +551,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "sps_current": SensorEntityDescription(
         key="sps_current",
         name="Secure Power Supply Current",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -556,6 +575,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "optimizer_current": SensorEntityDescription(
         key="optimizer_current",
         name="Optimizer Current",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -572,6 +592,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "optimizer_temp": SensorEntityDescription(
         key="optimizer_temp",
         name="Optimizer Temp",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -635,6 +656,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_current_a": SensorEntityDescription(
         key="battery_current_a",
         name="Battery Current A",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -642,6 +664,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_current_b": SensorEntityDescription(
         key="battery_current_b",
         name="Battery Current B",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -649,6 +672,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_current_c": SensorEntityDescription(
         key="battery_current_c",
         name="Battery Current C",
+        suggested_display_precision=1,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
@@ -656,6 +680,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_temp_a": SensorEntityDescription(
         key="battery_temp_a",
         name="Battery Temp A",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -663,6 +688,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_temp_b": SensorEntityDescription(
         key="battery_temp_b",
         name="Battery Temp B",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -670,6 +696,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_temp_c": SensorEntityDescription(
         key="battery_temp_c",
         name="Battery Temp C",
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -759,6 +786,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_charge_total": SensorEntityDescription(
         key="battery_charge_total",
         name="Battery Charge Total",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -766,6 +794,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_charge_a": SensorEntityDescription(
         key="battery_charge_a",
         name="Battery Charge A",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -774,6 +803,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_charge_b": SensorEntityDescription(
         key="battery_charge_b",
         name="Battery Charge B",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -782,6 +812,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_charge_c": SensorEntityDescription(
         key="battery_charge_c",
         name="Battery Charge C",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -821,6 +852,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_discharge_total": SensorEntityDescription(
         key="battery_discharge_total",
         name="Battery Discharge Total",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -828,6 +860,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_discharge_a": SensorEntityDescription(
         key="battery_discharge_a",
         name="Battery Discharge A",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -836,6 +869,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_discharge_b": SensorEntityDescription(
         key="battery_discharge_b",
         name="Battery Discharge B",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -844,6 +878,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "battery_discharge_c": SensorEntityDescription(
         key="battery_discharge_c",
         name="Battery Discharge C",
+        suggested_display_precision=2,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
@@ -856,7 +891,23 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
     ),
+
+    "active_power_limitation": SensorEntityDescription(
+        key="active_power_limitation",
+        name="Active Power Limitation",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    "power_limit_via_io": SensorEntityDescription(
+        key="power_limit_via_io",
+        name="Power Limit (IO)",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
 }
+
 
 
 async def async_setup_entry(
