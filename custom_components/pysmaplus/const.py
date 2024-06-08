@@ -16,7 +16,8 @@ PLATFORMS = [Platform.SENSOR]
 CONF_GROUP = "group"
 CONF_ACCESS = "access"
 CONF_ACCESSLONG = "accesslong"
-
+CONF_DEVICE = "device"
+CONF_SCAN_INTERVAL = "scaninterval"
 DEFAULT_SCAN_INTERVAL = 5
 
 GROUPS = ["user", "installer"]
