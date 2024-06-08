@@ -3,14 +3,24 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Dict
 
 import pysmaplus as pysma
+from pysmaplus.device import Device, DeviceInformation
 import voluptuous as vol
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import callback
 
 from homeassistant import config_entries, core
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_SSL, CONF_VERIFY_SSL
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_SSL,
+    CONF_VERIFY_SSL,
+    CONF_DEVICE,
+)
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigFlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
@@ -22,15 +32,14 @@ from .const import (
     ACCESS,
     CONF_ACCESSLONG,
     ACCESSLONG,
+    CONF_SCAN_INTERVAL,
+    DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(
-    hass: core.HomeAssistant, data: dict[str, Any]
-) -> dict[str, Any]:
-    """Validate the user input allows us to connect."""
+async def getPysmaInstance(hass: core.HomeAssistant, data: dict[str, Any]) -> Device:
     url = None
     session = None
     if data[CONF_ACCESS] == "speedwireinv":
@@ -42,7 +51,6 @@ async def validate_input(
     am = data[CONF_ACCESS]
     if am == "speedwire":
         am = "speedwireem"
-    _LOGGER.debug(f"Validate URL: {url} User: {data[CONF_GROUP]} Method: {am}")
     sma = pysma.getDevice(
         session,
         url,
@@ -50,18 +58,96 @@ async def validate_input(
         groupuser=data[CONF_GROUP],
         accessmethod=am,
     )
-
     await sma.new_session()
-    device_info = await sma.device_info()
-    await sma.close_session()
-
-    return device_info
+    return sma
 
 
-class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for SMA."""
+async def validate_input(
+    hass: core.HomeAssistant, data: dict[str, Any]
+) -> (dict[str, DeviceInformation], dict[str, str]):
+    """Validate the user input allows us to connect."""
+    errors: dict[str, str] = {}
 
-    VERSION = 1
+    device_list = None
+    try:
+        sma = await getPysmaInstance(hass, data)
+        device_list = await sma.device_list()
+        await sma.close_session()
+    except pysma.exceptions.SmaConnectionException:
+        errors["base"] = "cannot_connect"
+    except pysma.exceptions.SmaAuthenticationException:
+        errors["base"] = "invalid_auth"
+    except pysma.exceptions.SmaReadException:
+        errors["base"] = "cannot_retrieve_device_info"
+    except Exception:  # pylint: disable=broad-except
+        _LOGGER.exception("Unexpected exception")
+        errors["base"] = "unknown"
+
+    return device_list, errors
+
+
+class PySMAOptionsConfigFlow(config_entries.OptionsFlow):
+    """Handle a pyscript options flow."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize pyscript options flow."""
+        self.config_entry = config_entry
+        self._show_form = False
+
+    async def async_step_init(
+        self, user_input: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
+        """Manage the pyscript options."""
+        if user_input is None:
+            return self.async_show_form(
+                step_id="init",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_SCAN_INTERVAL,
+                            default=self.config_entry.data.get(CONF_SCAN_INTERVAL, 5),
+                        ): int
+                    },
+                    extra=vol.ALLOW_EXTRA,
+                ),
+            )
+
+        if any(
+            name not in self.config_entry.data
+            or user_input[name] != self.config_entry.data[name]
+            for name in [CONF_SCAN_INTERVAL]
+        ):
+            updated_data = self.config_entry.data.copy()
+            updated_data.update(user_input)
+            self.hass.config_entries.async_update_entry(
+                entry=self.config_entry, data=updated_data
+            )
+            return self.async_create_entry(title="", data={})
+
+        self._show_form = True
+        return await self.async_step_no_update()
+
+    async def async_step_no_update(
+        self, user_input: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
+        """Tell user no update to process."""
+        if self._show_form:
+            self._show_form = False
+            return self.async_show_form(step_id="no_update", data_schema=vol.Schema({}))
+
+        return self.async_create_entry(title="", data={})
+
+
+class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+    """Handle a config flow for SMA.
+    Dialogs
+    1. _user     Access Methode
+    2. _details  Details (User, Pwd) [optional, not needed for Energy Meter]
+    2. _device   Selection of the Device [optional, not needed]
+    """
+
+    VERSION = 2
+    MINOR_VERSION = 0
 
     def __init__(self) -> None:
         """Initialize."""
@@ -72,68 +158,59 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_ACCESS: ACCESS[0],
             CONF_GROUP: GROUPS[0],
             CONF_PASSWORD: vol.UNDEFINED,
+            CONF_DEVICE: vol.UNDEFINED,
+            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         }
+        self.listNames: list[str] = []
+        self.listDeviceInfo: list[DeviceInformation] = []
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> PySMAOptionsConfigFlow:
+        """Get the options flow for this handler."""
+        return PySMAOptionsConfigFlow(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """First step in config flow."""
         self.config_data = {}
-        errors = {}
-        if user_input is not None:
-            deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
-            if deviceIdx in [0, 1, 2]:
-                self.config_data.update(user_input)
-                # Return the form of the next step
-                return await self.async_step_details()
+        errors: dict[str, str] = {}
+        if user_input is None:
+            data_schema = vol.Schema(
+                {
+                    vol.Required(
+                        CONF_ACCESSLONG,
+                        default=ACCESSLONG[ACCESS.index(self._data[CONF_ACCESS])],
+                    ): vol.In(ACCESSLONG),
+                }
+            )
+            return self.async_show_form(
+                step_id="user", data_schema=data_schema, errors=errors
+            )
 
-            if deviceIdx == 3:
-                # EM/SHM2 do not require any further parameters.
-                self._data[CONF_HOST] = "localhost"
-                self._data[CONF_SSL] = False
-                self._data[CONF_VERIFY_SSL] = False
-                self._data[CONF_GROUP] = ""
-                self._data[CONF_PASSWORD] = ""
-                self._data[CONF_ACCESS] = ACCESS[deviceIdx]
+        deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
+        if deviceIdx in [0, 1, 2]:
+            self.config_data.update(user_input)
+            # Return the form of the next step
+            return await self.async_step_details()
 
-                try:
-                    device_info = await validate_input(self.hass, self._data)
-                except pysma.exceptions.SmaConnectionException:
-                    errors["base"] = "cannot_connect"
-                except pysma.exceptions.SmaAuthenticationException:
-                    errors["base"] = "invalid_auth"
-                except pysma.exceptions.SmaReadException:
-                    errors["base"] = "cannot_retrieve_device_info"
-                except Exception:  # pylint: disable=broad-except
-                    _LOGGER.exception("Unexpected exception")
-                    errors["base"] = "unknown"
+        if deviceIdx == 3:
+            # EM/SHM2 do not require any further parameters.
+            self._data[CONF_HOST] = "localhost"
+            self._data[CONF_SSL] = False
+            self._data[CONF_VERIFY_SSL] = False
+            self._data[CONF_GROUP] = ""
+            self._data[CONF_PASSWORD] = ""
+            self._data[CONF_ACCESS] = ACCESS[deviceIdx]
+            self._data[CONF_DEVICE] = ""
+            return await self.async_step_deviceselection()
 
-                if not errors:
-                    await self.async_set_unique_id(device_info["serial"])
-                    self._abort_if_unique_id_configured(updates=self._data)
-                    return self.async_create_entry(
-                        title=device_info["name"]
-                        + " ("
-                        + str(device_info["serial"])
-                        + ")",
-                        data=self._data,
-                    )
-
-        data_schema = vol.Schema(
-            {
-                vol.Required(
-                    CONF_ACCESSLONG,
-                    default=ACCESSLONG[ACCESS.index(self._data[CONF_ACCESS])],
-                ): vol.In(ACCESSLONG),
-            }
-        )
-        return self.async_show_form(
-            step_id="user", data_schema=data_schema, errors=errors
-        )
+        return self.async_abort(reason="not_supported")
 
     async def async_step_details(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """First step in config flow."""
         errors = {}
 
@@ -145,29 +222,8 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._data[CONF_GROUP] = user_input.get(CONF_GROUP, "")
             self._data[CONF_PASSWORD] = user_input.get(CONF_PASSWORD, "")
             self._data[CONF_ACCESS] = ACCESS[deviceIdx]
-
-            try:
-                device_info = await validate_input(self.hass, self._data)
-            except pysma.exceptions.SmaConnectionException:
-                errors["base"] = "cannot_connect"
-            except pysma.exceptions.SmaAuthenticationException:
-                errors["base"] = "invalid_auth"
-            except pysma.exceptions.SmaReadException:
-                errors["base"] = "cannot_retrieve_device_info"
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
-
-            if not errors:
-                serial = device_info["serial"]
-                if serial == 0:
-                    serial = self._data[CONF_HOST]
-                await self.async_set_unique_id(serial)
-                self._abort_if_unique_id_configured(updates=self._data)
-                return self.async_create_entry(
-                    title=device_info["name"] + " (" + self._data[CONF_HOST] + ")",
-                    data=self._data,
-                )
+            self._data[CONF_DEVICE] = ""
+            return await self.async_step_deviceselection()
 
         if deviceIdx == 0:
             data_schema = vol.Schema(
@@ -206,4 +262,57 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="details", data_schema=data_schema, errors=errors
+        )
+
+    async def async_step_deviceselection(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """."""
+
+        if user_input is None:
+            # Create a list of all devices
+            errors = {}
+            device_list, errors = await validate_input(self.hass, self._data)
+            self.listNames = []
+            self.listDeviceInfo = []
+            self.deviceList = device_list
+            for i in device_list.values():
+                self.listNames.append(f"{i.name} {i.type} ({i.serial})")
+                self.listDeviceInfo.append(i)
+            if errors:
+                return self.async_abort(reason="Error testing devices")
+            if len(self.listDeviceInfo) == 1:
+                self._data[CONF_DEVICE] = self.listDeviceInfo[0].id
+
+        if user_input is not None:
+            idx = self.listNames.index(user_input.get(CONF_DEVICE))
+            self._data[CONF_DEVICE] = self.listDeviceInfo[idx].id
+
+        if self._data[CONF_DEVICE] != "":
+            return await self.createEntry(self.deviceList[self._data[CONF_DEVICE]])
+
+        data_schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_DEVICE,
+                ): vol.In(self.listNames),
+            }
+        )
+        return self.async_show_form(
+            step_id="deviceselection", data_schema=data_schema, errors=errors
+        )
+
+    async def createEntry(self, device_info: DeviceInformation):
+        """Create Entry based on device_info"""
+        await self.async_set_unique_id(
+            self._data[CONF_ACCESS]
+            + "-"
+            + str(device_info.serial)
+            + "-"
+            + str(device_info.id)
+        )
+        self._abort_if_unique_id_configured(updates=self._data)
+        return self.async_create_entry(
+            title=device_info.name + " (" + str(device_info.serial) + ")",
+            data=self._data,
         )

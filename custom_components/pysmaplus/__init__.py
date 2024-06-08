@@ -7,6 +7,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import pysmaplus as pysma
+from .config_flow import getPysmaInstance
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -28,6 +29,8 @@ from .const import (
     CONF_GROUP,
     CONF_ACCESS,
     DEFAULT_SCAN_INTERVAL,
+    CONF_SCAN_INTERVAL,
+    CONF_DEVICE,
     DOMAIN,
     PLATFORMS,
     PYSMA_COORDINATOR,
@@ -37,6 +40,7 @@ from .const import (
     PYSMA_SENSORS,
     PYSMA_ENTITIES,
 )
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,9 +74,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         await sma.new_session()
         # Get updated device info
-        sma_device_info = await sma.device_info()
+        device_list = await sma.device_list()
+        sma_device_info = device_list[entry.data[CONF_DEVICE]]
         # Get all device sensors
-        sensor_def = await sma.get_sensors()
+        sensor_def = await sma.get_sensors(entry.data[CONF_DEVICE])
     except (
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,
@@ -87,17 +92,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         #        configuration_url=url,
         configuration_url=None,
         identifiers={(DOMAIN, entry.unique_id)},
-        manufacturer=sma_device_info["manufacturer"],
-        model=sma_device_info["type"],
-        name=sma_device_info["name"],
-        sw_version=sma_device_info["sw_version"],
+        manufacturer=sma_device_info.manufacturer,
+        model=sma_device_info.type,
+        name=sma_device_info.name,
+        sw_version=sma_device_info.sw_version,
     )
 
     # Define the coordinator
     async def async_update_data():
         """Update the used SMA sensors."""
         try:
-            await sma.read(sensor_def)
+            await sma.read(sensor_def, entry.data[CONF_DEVICE])
         except (
             pysma.exceptions.SmaReadException,
             pysma.exceptions.SmaConnectionException,
@@ -105,7 +110,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             raise UpdateFailed(exc) from exc
 
     interval = timedelta(
-        seconds=entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
     )
 
     coordinator = DataUpdateCoordinator(
@@ -156,3 +161,38 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         data[PYSMA_REMOVE_LISTENER]()
 
     return unload_ok
+
+
+async def async_migrate_entry(hass, config_entry: ConfigEntry):
+    """Migrate old entry."""
+    _LOGGER.error(
+        "Migrating configuration from version %s.%s",
+        config_entry.version,
+        config_entry.minor_version,
+    )
+
+    if config_entry.version > 2:
+        return False
+
+    if config_entry.version == 1:
+
+        # Add Device and Scan_interval to config
+        new_data = {**config_entry.data}
+        sma = await getPysmaInstance(hass, new_data)
+        device_info = await sma.device_info()
+        await sma.close_session()
+        if "id" not in device_info:
+            _LOGGER.error("Can not migrate! %s %s", config_entry, device_info)
+            return False
+        new_data[CONF_DEVICE] = device_info["id"]
+        new_data[CONF_SCAN_INTERVAL] = 5
+        hass.config_entries.async_update_entry(
+            config_entry, data=new_data, minor_version=0, version=2
+        )
+
+        _LOGGER.error(
+            "Migration to configuration version %s.%s successful",
+            config_entry.version,
+            config_entry.minor_version,
+        )
+    return True

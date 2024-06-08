@@ -34,7 +34,34 @@
                 },
                 "description": "Enter your SMA device information.",
                 "title": "Set up SMA Solar"
+            },
+            "deviceselection": {
+                "data": {
+                    "device": "Device"
+                },
+                "data_description": {
+                    "device": "Special case ennexOS:\n\nThe measured values are supplied in two parts. Once for the device (IGULD:SELF) and once for the whole plant (Plant:1). They may also mirror the data from the energy meters (EM:0174-XXXXXXXXXX)."
+                },
+                "description": "The following devices were found.",
+                "title": "Device selection"
             }
+             
       }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update configuration",
+        "data": {
+          "scaninterval": "Update interval"
+        },
+        "description": "After a change, HA must be restarted manually.\n\nValues of less than 5 seconds significantly increase the load for HA and can overload slow computers.\nIn any case, please specify deactivate any sensors that are not required."
+      },
+      "no_update": {
+        "title": "No update needed",
+        "description": "There is nothing to update."
+      }
+    }
   }
+ 
 }
