@@ -3,9 +3,10 @@
   "name": "SMA Devices Plus (not for production use)",
   "codeowners": ["@littleyoda", "@kellerza", "@rklomp"],
   "config_flow": true,
-  "documentation": "https://github.com/littleyoda/pysma/tree/tripowerX",
-  "iot_class": "local_polling",
+  "documentation": "https://github.com/littleyoda/ha-pysmaplus",
   "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/littleyoda/ha-pysmaplus/issues",
   "loggers": ["pysma"],
   "requirements": ["pysma-plus>=0.3.0"],
   "version": "0.3.0"
