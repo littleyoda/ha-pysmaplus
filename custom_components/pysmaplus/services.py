@@ -18,7 +18,7 @@ from homeassistant.core import (
 )
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers import entity_registry as er
-from .const import DOMAIN, PYSMA_ENTITIES, PYSMA_OBJECT
+from .const import DOMAIN, PYSMA_ENTITIES, PYSMA_OBJECT, PYSMA_DEVICE_INFO, PYSMA_DEVICEID
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ SERVICES = [SERVICE_SET_VALUE]  # , SERVICE_AC_START, SERVICE_CHARGE_SET_SCHEDUL
 
 def get_sensor_from_entityid(
     hass: HomeAssistant, entity_id: str
-) -> (SMAsensor, pysma.Device):
+) -> (SMAsensor, pysma.Device, str):
     """This method seems rather complicated to me.
     Who knows a better method?"""
     # get RegisterEntry
@@ -60,7 +60,7 @@ def get_sensor_from_entityid(
             deviceCfg = hass.data[DOMAIN][configidx]
             for sensor in deviceCfg[PYSMA_ENTITIES]:
                 if sensor._attr_unique_id == uid:
-                    return (sensor, hass.data[DOMAIN][configidx][PYSMA_OBJECT])
+                    return (sensor, hass.data[DOMAIN][configidx][PYSMA_OBJECT], hass.data[DOMAIN][configidx][PYSMA_DEVICEID])
     return None
 
 
@@ -76,9 +76,10 @@ def setup_services(hass: HomeAssistant) -> None:
 
     async def set_value(service_call: ServiceCall) -> None:
         """Set Parameter Value."""
-        sensor, device = get_sensor_from_entityid(hass, service_call.data["entity_id"])
-        LOGGER.debug(f'Setting {sensor.name} to {int(service_call.data["value"])}')
-        await device.set_parameter(sensor._sensor, int(service_call.data["value"]))
+        sensor, pysmadevice, deviceid = get_sensor_from_entityid(hass, service_call.data["entity_id"])
+        LOGGER.debug(f'Setting {deviceid} / {sensor.name} to {int(service_call.data["value"])}')
+        await pysmadevice.set_parameter(sensor._sensor, int(service_call.data["value"]), deviceid)
+                                   
 
     hass.services.async_register(
         DOMAIN,
@@ -90,7 +91,7 @@ def setup_services(hass: HomeAssistant) -> None:
 
     async def get_value_range(service_call: ServiceCall) -> ServiceResponse:
         """Return the allowed values."""
-        sensor, device = get_sensor_from_entityid(hass, service_call.data["entity_id"])
+        sensor, pysmadevice, deviceid = get_sensor_from_entityid(hass, service_call.data["entity_id"])
         return {
             "typ": sensor._sensor.range.typ,
             "values": sensor._sensor.range.values,

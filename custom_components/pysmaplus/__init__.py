@@ -39,6 +39,7 @@ from .const import (
     PYSMA_REMOVE_LISTENER,
     PYSMA_SENSORS,
     PYSMA_ENTITIES,
+    PYSMA_DEVICEID
 )
 
 
@@ -72,6 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     try:
+        # Start seession/Test connection
         await sma.new_session()
         # Get updated device info
         device_list = await sma.device_list()
@@ -87,7 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if TYPE_CHECKING:
         assert entry.unique_id
 
-    # Create DeviceInfo object from sma_device_info
+    # Create HA-DeviceInfo object from sma_device_info
     device_info = DeviceInfo(
         #        configuration_url=url,
         configuration_url=None,
@@ -144,6 +146,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         PYSMA_REMOVE_LISTENER: remove_stop_listener,
         PYSMA_DEVICE_INFO: device_info,
         PYSMA_ENTITIES: [],
+        PYSMA_DEVICEID: entry.data[CONF_DEVICE],
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

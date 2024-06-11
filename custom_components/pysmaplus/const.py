@@ -10,6 +10,7 @@ PYSMA_REMOVE_LISTENER = "remove_listener"
 PYSMA_SENSORS = "pysma_sensors"
 PYSMA_DEVICE_INFO = "device_info"
 PYSMA_ENTITIES = "entities"
+PYSMA_DEVICEID  = "deviceid"
 
 PLATFORMS = [Platform.SENSOR]
 
