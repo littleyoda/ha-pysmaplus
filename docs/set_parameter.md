@@ -1,6 +1,6 @@
 With enneox-OS based devices, it is possible to change selected parameters via Service Call.
 
-<img valign="top" src="set_parameter.png" width="50%"/><img valign="top" src="get_settings.png" width="50%"/>
+<img valign="top" src="images/set_parameter.png" width="50%"/><img valign="top" src="images/get_settings.png" width="50%"/>
 
 Currently supported parameters:
 

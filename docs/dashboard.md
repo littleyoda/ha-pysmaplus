@@ -10,7 +10,7 @@ If you want to see the current consumption, power-flow-card-plus can be set up.
 | Solar | Total Yield | inverter
 | Battery |  - |XX | XX
 
-<img src="ha-energy-dashboard.png" width="50%"/>
+<img src="images/ha-energy-dashboard.png" width="50%"/>
 
 
 ## Power Flow Card Plus
@@ -27,5 +27,5 @@ The dashboard shows the current situation. The current production, the current c
 | Battery| Separate Entity | Consumption: Consumption: Battery Power Discharge Total<br> Production: Battery Power Charge Total | battery/inverter
 | Battery |  - | State of charge: Battery SOC Total | battery/inverter
 
-<img src="power-flow-card-plus01.png" width="50%"/>
-<img src="power-flow-card-plus02.png" width="50%"/>
+<img src="images/power-flow-card-plus01.png" width="50%"/>
+<img src="images/power-flow-card-plus02.png" width="50%"/>
