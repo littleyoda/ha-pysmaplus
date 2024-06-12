@@ -13,6 +13,13 @@ Used Version of ha-pysmaplus
 **Describe the bug, Remarks, ...**
 A clear and concise description of what the bug is.
 
+**Used Interface/Access Method**
+see https://raw.githubusercontent.com/littleyoda/ha-pysmaplus/main/docs/images/interfaces.png
+Speedwire: [ ]
+Webconnect: [ ]
+EnnexOS-based: [ ]
+Energymeter/SHM2: [ ]
+
 **List of the integrated SMA devices**
 Inverter:
 Energymeter:
