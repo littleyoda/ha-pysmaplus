@@ -283,6 +283,9 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             self.listNames = []
             self.listDeviceInfo = []
             self.deviceList = device_list
+            if self.deviceList is None or len(self.deviceList.values()) == 0:
+                return self.async_abort(reason="No Device found!")
+
             for i in device_list.values():
                 self.listNames.append(f"{i.name} {i.type} ({i.serial})")
                 self.listDeviceInfo.append(i)
