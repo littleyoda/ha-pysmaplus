@@ -190,7 +190,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             )
 
         deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
-        if deviceIdx in [0, 1, 2]:
+        if deviceIdx in [0, 1, 2, 4]:
             self.config_data.update(user_input)
             # Return the form of the next step
             return await self.async_step_details()
@@ -254,6 +254,13 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
                     vol.Required(CONF_GROUP, default=self._data[CONF_GROUP]): cv.string,
+                    vol.Required(CONF_PASSWORD): cv.string,
+                }
+            )
+        elif deviceIdx == 4:
+            data_schema = vol.Schema(
+                {
+                    vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
             )

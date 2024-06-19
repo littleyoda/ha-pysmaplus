@@ -95,6 +95,7 @@ def setup_services(hass: HomeAssistant) -> None:
         return {
             "typ": sensor._sensor.range.typ,
             "values": sensor._sensor.range.values,
+            "names": sensor._sensor.range.names(),
             "editable": sensor._sensor.range.editable,
         }
 

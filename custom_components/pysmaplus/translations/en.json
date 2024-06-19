@@ -17,7 +17,7 @@
                 },
                 "data_description": {
                 },
-                "description": "## Webconnect\nDevices that supports the webconnect standard. Many SMA devices from end of 2014 to 2023. (e.g. Sunny Tripower Smart Energy, Sunny Boy Storage)\n\n## EnnoxOS\nNewer devices from SMA from approx. 2023. (e.g. Tripower X, EVCharger)\n\n## Speedwire Energymeter\nSunny Home Manager 2 as well Energymeter 10/20\n\n## Speedwire\nAlmost all SMA devices with a network connection. Only unencrypted communication is supported. The password for the account \"user\" can be set using the Sunny Explorer Software",
+                "description": "## Webconnect\nDevices that supports the webconnect standard. Many SMA devices from end of 2014 to 2023. (e.g. Sunny Tripower Smart Energy, Sunny Boy Storage)\n\n## EnnoxOS\nNewer devices from SMA from approx. 2023. (e.g. Tripower X, EVCharger)\n\n## Speedwire Energymeter\nSunny Home Manager 2 as well Energymeter 10/20\n\n## Speedwire\nAlmost all SMA devices with a network connection. Only unencrypted communication is supported. The password for the account \"user\" or \"installer\" is needed.",
                 "title": "Set up SMA Solar"
           },
           "details": {

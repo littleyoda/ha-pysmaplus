@@ -891,7 +891,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
     ),
-
     "active_power_limitation": SensorEntityDescription(
         key="active_power_limitation",
         name="Active Power Limitation",
@@ -906,6 +905,18 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
     ),
+    "operating_mode_plant_control": SensorEntityDescription(
+        key="operating_mode_plant_control",
+        name="Operating Mode Plant Control",
+    ),
+    "power_setpoint_plant_control": SensorEntityDescription(
+        key="power_setpoint_plant_control",
+        name="Power Setpoint Plant Control",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+
 }
 
 
