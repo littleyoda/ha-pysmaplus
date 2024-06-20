@@ -1,6 +1,8 @@
 from __future__ import annotations
+from ipaddress import ip_network
+from homeassistant.components import network
 
-from typing import Any
+from typing import Any, Dict, List
 
 from attr import asdict
 
@@ -46,6 +48,16 @@ async def getDevices(hass: HomeAssistant, entry_id: str):
         devices.append({"device": asdict(device), "entities": entities})
     return devices
 
+async def getnetworkConfig(hass: HomeAssistant) -> List[Dict[str, Any]]:
+    adapters = await network.async_get_adapters(hass)
+    netInfo = []
+    for adapter in adapters:
+        for ip_info in adapter["ipv4"]:
+            netInfo.append({
+                "local_ip": ip_info["address"],
+                "network_prefix": ip_info["network_prefix"],
+            })
+    return netInfo
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, config_entry: ConfigEntry
@@ -59,5 +71,5 @@ async def async_get_config_entry_diagnostics(
     diag["device_info"] = details["device_info"]
     diag["devices"] = await getDevices(hass, entry_id)
     diag["values"] = await details[PYSMA_OBJECT].get_debug()
-
+    diag["netinfo"] = await getnetworkConfig(hass)
     return async_redact_data(diag, REDACT_KEYS)
