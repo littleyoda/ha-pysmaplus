@@ -48,16 +48,20 @@ async def getDevices(hass: HomeAssistant, entry_id: str):
         devices.append({"device": asdict(device), "entities": entities})
     return devices
 
+
 async def getnetworkConfig(hass: HomeAssistant) -> List[Dict[str, Any]]:
     adapters = await network.async_get_adapters(hass)
     netInfo = []
     for adapter in adapters:
         for ip_info in adapter["ipv4"]:
-            netInfo.append({
-                "local_ip": ip_info["address"],
-                "network_prefix": ip_info["network_prefix"],
-            })
+            netInfo.append(
+                {
+                    "local_ip": ip_info["address"],
+                    "network_prefix": ip_info["network_prefix"],
+                }
+            )
     return netInfo
+
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, config_entry: ConfigEntry

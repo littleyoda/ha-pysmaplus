@@ -916,9 +916,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
     ),
-
 }
-
 
 
 async def async_setup_entry(

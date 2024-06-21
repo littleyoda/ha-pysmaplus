@@ -10,7 +10,7 @@ PYSMA_REMOVE_LISTENER = "remove_listener"
 PYSMA_SENSORS = "pysma_sensors"
 PYSMA_DEVICE_INFO = "device_info"
 PYSMA_ENTITIES = "entities"
-PYSMA_DEVICEID  = "deviceid"
+PYSMA_DEVICEID = "deviceid"
 
 PLATFORMS = [Platform.SENSOR]
 
@@ -22,7 +22,7 @@ CONF_SCAN_INTERVAL = "scaninterval"
 DEFAULT_SCAN_INTERVAL = 5
 
 GROUPS = ["user", "installer"]
-ACCESS = ["speedwireinv", "webconnect", "ennexos", "speedwireem","shm2"]
+ACCESS = ["speedwireinv", "webconnect", "ennexos", "speedwireem", "shm2"]
 ACCESSLONG = [
     "SMA Devices with Speedwire",
     "SMA Devices with Webconnect",

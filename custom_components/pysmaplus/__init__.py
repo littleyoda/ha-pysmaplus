@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
-from typing import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Any
 import pysmaplus as pysma
-from .config_flow import getPysmaInstance
+from pysmaplus import Device
+from homeassistant.components import network
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -28,7 +28,6 @@ from .services import setup_services
 from .const import (
     CONF_GROUP,
     CONF_ACCESS,
-    DEFAULT_SCAN_INTERVAL,
     CONF_SCAN_INTERVAL,
     CONF_DEVICE,
     DOMAIN,
@@ -39,39 +38,51 @@ from .const import (
     PYSMA_REMOVE_LISTENER,
     PYSMA_SENSORS,
     PYSMA_ENTITIES,
-    PYSMA_DEVICEID
+    PYSMA_DEVICEID,
 )
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up sma from a config entry."""
-    # Init the SMA interface
-
+async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
+    """Returns a pysma Instance"""
+    url = None
     session = None
-    if entry.data[CONF_ACCESS] == "speedwireinv":
-        url = entry.data[CONF_HOST]
-    elif CONF_SSL in entry.data and CONF_HOST in entry.data:
-        protocol = "https" if entry.data[CONF_SSL] else "http"
-        url = f"{protocol}://{entry.data[CONF_HOST]}"
-        session = async_get_clientsession(hass, verify_ssl=entry.data[CONF_VERIFY_SSL])
-    am = entry.data[CONF_ACCESS]
+    if data[CONF_ACCESS] == "speedwireinv":
+        url = data[CONF_HOST]
+    elif CONF_SSL in data and CONF_HOST in data:
+        protocol = "https" if data[CONF_SSL] else "http"
+        url = f"{protocol}://{data[CONF_HOST]}"
+        session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
+    am = data[CONF_ACCESS]
     if am == "speedwire":
         am = "speedwireem"
-
-    _LOGGER.debug(
-        f"Setup Entry => URL: {url} User: {entry.data[CONF_GROUP]} Method: {am}"
-    )
     sma = pysma.getDevice(
         session,
         url,
-        password=entry.data[CONF_PASSWORD],
-        groupuser=entry.data[CONF_GROUP],
+        password=data[CONF_PASSWORD],
+        groupuser=data[CONF_GROUP],
         accessmethod=am,
     )
 
+    # Adding Bindingaddresses for energy meter multicast
+    if am == "speedwireem":
+        addrs = []
+        adapters = await network.async_get_adapters(hass)
+        for adapter in adapters:
+            for ip_info in adapter["ipv4"]:
+                addrs.append(ip_info["address"])
+        _LOGGER.info("Binding Addr: " + ",".join(addrs))
+        sma.set_options({"bindingaddr": ",".join(addrs)})
+    await sma.new_session()
+    return sma
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up sma from a config entry."""
+    # Init the SMA interface
+    sma = await getPysmaInstance(hass, entry.data)
     try:
         # Start seession/Test connection
         await sma.new_session()

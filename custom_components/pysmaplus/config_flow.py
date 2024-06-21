@@ -5,61 +5,34 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict
 
+import homeassistant.helpers.config_validation as cv
+from pysmaplus.device import DeviceInformation
+from . import getPysmaInstance
 import pysmaplus as pysma
-from pysmaplus.device import Device, DeviceInformation
 import voluptuous as vol
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import callback
-
 from homeassistant import config_entries, core
+from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import (
+    CONF_DEVICE,
     CONF_HOST,
     CONF_PASSWORD,
     CONF_SSL,
     CONF_VERIFY_SSL,
-    CONF_DEVICE,
 )
-from homeassistant.data_entry_flow import FlowResult
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigFlowResult
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
-
+from homeassistant.core import callback
 from .const import (
-    CONF_GROUP,
-    DOMAIN,
-    GROUPS,
-    CONF_ACCESS,
     ACCESS,
-    CONF_ACCESSLONG,
     ACCESSLONG,
+    CONF_ACCESS,
+    CONF_ACCESSLONG,
+    CONF_GROUP,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    GROUPS,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-async def getPysmaInstance(hass: core.HomeAssistant, data: dict[str, Any]) -> Device:
-    url = None
-    session = None
-    if data[CONF_ACCESS] == "speedwireinv":
-        url = data[CONF_HOST]
-    elif CONF_SSL in data and CONF_HOST in data:
-        protocol = "https" if data[CONF_SSL] else "http"
-        url = f"{protocol}://{data[CONF_HOST]}"
-        session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
-    am = data[CONF_ACCESS]
-    if am == "speedwire":
-        am = "speedwireem"
-    sma = pysma.getDevice(
-        session,
-        url,
-        password=data[CONF_PASSWORD],
-        groupuser=data[CONF_GROUP],
-        accessmethod=am,
-    )
-    await sma.new_session()
-    return sma
 
 
 async def validate_input(
