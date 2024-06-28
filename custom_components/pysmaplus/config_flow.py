@@ -55,7 +55,6 @@ async def validate_input(
     except Exception:  # pylint: disable=broad-except
         _LOGGER.exception("Unexpected exception")
         errors["base"] = "unknown"
-
     return device_list, errors
 
 
@@ -143,6 +142,8 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         """Get the options flow for this handler."""
         return PySMAOptionsConfigFlow(config_entry)
 
+    # "User" => 0,1,2,4 => details => selection
+    #        => 3 => selection
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -253,6 +254,8 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             # Create a list of all devices
             errors = {}
             device_list, errors = await validate_input(self.hass, self._data)
+            if errors:
+                return self.async_abort(reason=errors["base"])
             self.listNames = []
             self.listDeviceInfo = []
             self.deviceList = device_list
@@ -262,8 +265,6 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             for i in device_list.values():
                 self.listNames.append(f"{i.name} {i.type} ({i.serial})")
                 self.listDeviceInfo.append(i)
-            if errors:
-                return self.async_abort(reason="Error testing devices")
             if len(self.listDeviceInfo) == 1:
                 self._data[CONF_DEVICE] = self.listDeviceInfo[0].id
 

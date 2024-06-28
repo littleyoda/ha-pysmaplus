@@ -2,12 +2,16 @@
     "config": {
         "abort": {
             "already_configured": "Device is already configured",
-            "already_in_progress": "Configuration flow is already in progress"
+            "already_in_progress": "Configuration flow is already in progress",
+            "cannot_connect": "Failed to connect. Please check hostname/ip.",
+            "cannot_retrieve_device_info": "Successfully connected, but unable to retrieve the device information",
+            "invalid_auth": "Invalid authentication. Please check user/group and password.",
+            "unknown": "Unexpected error"
         },
         "error": {
-            "cannot_connect": "Failed to connect",
+            "cannot_connect": "Failed to connect. Please check hostname/ip.",
             "cannot_retrieve_device_info": "Successfully connected, but unable to retrieve the device information",
-            "invalid_auth": "Invalid authentication",
+            "invalid_auth": "Invalid authentication. Please check user/group and password.",
             "unknown": "Unexpected error"
         },
         "step": {
