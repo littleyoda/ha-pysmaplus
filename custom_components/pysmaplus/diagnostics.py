@@ -17,7 +17,8 @@ from .const import (
 )
 
 
-REDACT_KEYS = {"host", "password", "group"}
+REDACT_KEYS = {"host", "password", "group", "city", "federalState",
+               "latitude","longitude", "street", "streetNo", "zipCode"}
 
 
 async def getDevices(hass: HomeAssistant, entry_id: str):
