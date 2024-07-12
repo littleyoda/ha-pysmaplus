@@ -1,0 +1,13 @@
+on: [issue_comment]
+
+jobs:
+  bossbot_issue_comment_cleanup:
+    runs-on: ubuntu-latest
+    name: BossBot Issues Cleanup
+    steps:
+      - uses: actions/checkout@v2
+      - name: BossBot Issues Cleanup - action step
+        uses: banagale/bossbot-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHOW_ANNOTATION: true
