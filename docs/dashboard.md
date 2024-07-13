@@ -8,7 +8,7 @@ If you want to see the current consumption, power-flow-card-plus can be set up.
 |---|---|--|
 | Grid  | Grid Consumption:  Metering Total Absorbed <br> Return to Grid:  Metering Total Yield | Energy Meter  |
 | Solar | Total Yield | inverter
-| Battery |  - |XX | XX
+| Battery |  Energy going in to the battery: Battery Charge Total<br> Energy going out of the battery: Battery Discharge Total | inverter / battery
 
 <img src="images/ha-energy-dashboard.png" width="50%"/>
 
