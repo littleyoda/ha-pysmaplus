@@ -90,6 +90,10 @@
             }
         },
         "name": "Get Settings"
+    },
+    "run_discovery": {
+        "description": "Tries to discovery SMA-Devices.",
+        "name": "Run Discovery"
     }
     }
 
