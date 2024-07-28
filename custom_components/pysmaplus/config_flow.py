@@ -110,8 +110,11 @@ class PySMAOptionsConfigFlow(config_entries.OptionsFlow):
         return self.async_create_entry(title="", data={})
 
 
+
 class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
-    """Handle a config flow for SMA.
+    """Entry-Point for HomeAssistnat
+    
+    Handle a config flow for SMA.
     Dialogs
     1. _user     Access Methode
     2. _details  Details (User, Pwd) [optional, not needed for Energy Meter]
