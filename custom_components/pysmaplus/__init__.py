@@ -51,9 +51,15 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
     session = None
     if data[CONF_ACCESS] == "speedwireinv":
         url = data[CONF_HOST]
-    elif CONF_SSL in data and CONF_HOST in data:
+    elif data[CONF_ACCESS] == "webconnect":
         protocol = "https" if data[CONF_SSL] else "http"
         url = f"{protocol}://{data[CONF_HOST]}"
+        session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
+    elif CONF_SSL in data and CONF_HOST in data:
+        url = {data[CONF_HOST]}
+        protocol = "https" if data[CONF_SSL] else "http"
+        if "://" not in url:
+            url = f"{protocol}://{data[CONF_HOST]}"
         session = async_get_clientsession(hass, verify_ssl=data[CONF_VERIFY_SSL])
     am = data[CONF_ACCESS]
     if am == "speedwire":
