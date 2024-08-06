@@ -14,3 +14,6 @@ see [Dashboard Page](dashboard.md)
 
 # Can I also change the inverter setting? 
 see [Set Parameter Page](set_parameter.md)
+
+# EM/SHM2: I do not receive multicast packets
+see [SHM2 Multicast](shm2_multicast.md)
