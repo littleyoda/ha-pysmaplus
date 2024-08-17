@@ -1,40 +1,24 @@
-# ha-pysmaplus
-Diese Intergration ermöglicht den Zugriff auf verschiedene Geräte (Wechselrichter, Batteriespeicher) von SMA.
+The SMA integration currently available in Home Assistant only supports devices that use the Webconnect standard.
 
-Da jedes Geräte unterschiedliche Intnerfaces zur Verfügung stellt, muss bei dieser Integration ausgewählt werden, welches Interface gentutzw erden soll.
-
-# Webconnect
-Ist die Zugriffsart die in der aktuellen SMA Integration von Home Assistant genutzt wird. Hierbei werden die Werte über das Webinterface des Gerätes abgerufen.
-
-Geräte: z.B. Sunny Tripower Smart Energy , Sunny Boy Storage
+This integration supports almost all SMA devices like inverters, hybrid inverters, battery inverters and energy meters.
 
 
-# EnnexOS
-Die neuen Geräte (Tripower X und EVCharger) von SMA nutzen primär das Ennex-Betriebssystem. Ein Webserver, der die Werte liefert, ist vorhanden. Da das Webinterface sich im Vergleich zum Webconnect komplett geändert hat, musste ein neuer Adapter geschrieben werden, um die Daten abzurufen.
+# Supported Devices
+* (as before) Webconnect devices
+* EnnexOS-based devices (currently e.g. Tripower X)
+* Devices with a Speedwire-Interface
+* Energy Meter (EMETER-10 + 20) and Sunny Home Manager 2
 
-Geräte: Tripower X und EVCharger
+A list of devices that have been successfully tested can be found [here](https://github.com/littleyoda/pysma/blob/master/README.md)
 
-
-# Speedwire EM
-Der SHM2 und die Engerymeter übermittelt von sich aus die Daten per Multicast im Speedwire Format. Die Programme müssen hierbei nur auf den Netzwerktraffik lauschen und können die Werte dann dekodieren. Das Format für dieses eine Nachrichten Format hat SMA mittlerweile offen gelegt.
-
-Geräte: Energymeter + Sunny Home Manager 2
-
-
-# Speedwire
-Fast alle(?) SMA Geräte unterstützen standardmäßig die Kommunikation per Speedwire. Dieses Protokoll ist aber nicht offen gelegt und ein paar Personen haben versucht, zumindest die unverschlüsselte Version des Protokolls zu dekodieren.
-
-Voraussetzungen: Die Speedwire-Verschlüsselung darf nicht aktiviert werden. Defaultmäßig ist dieser für die Gruppe User auf 0000 und für die Grupper Installer auf 1111 eingestellt.
-
-Geräte: alle, insbesondere Geräte, die von den anderen Interfaces nicht unterstützt werden z.B. Sunny Island
-
-
-# Einschränkungen:
-
-Da alle Interfaces, außer Energy Meter, ohne offizielle Unterlagen von SMA enträtselt wurden, kann es immer sein, dass etwas falsch interpretiert wurde. Außerdem sind die Interfaces im Zweifelsfall nicht vollständig. Gerade die Speedwire Implementierung ist noch unvollständig.
-
-Speedwire hat aktuell den kleinsten Umfang an Sensoren, so dass EnnexOS oder Speedwire bevorzugt genutzt werden sollte.
-Speedwire ist für die Geräte, die kein anderes Interface unterstützen, oder als Fallback.
-
-
-
+# Installation
+*   HACS must be installed
+*   You have to add my repository in HACS.
+    https://github.com/littleyoda/ha-pysmaplus
+* Then add the following integration via HACS
+    SMA Devices Plus
+* Restart HA
+*  Add your SMA devices based on the SMA Device Plus integration.
+    (Settings / Devices & Services / Integrations)
+*   Not all entities are enabled
+*    automatically. You may have to enable them manually.
