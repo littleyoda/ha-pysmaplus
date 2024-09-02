@@ -26,7 +26,7 @@
           },
           "details": {
                 "data": {
-                    "group": "Group",
+                    "group": "User or Group",
                     "host": "Host",
                     "password": "Password",
                     "ssl": "Uses an SSL certificate",
