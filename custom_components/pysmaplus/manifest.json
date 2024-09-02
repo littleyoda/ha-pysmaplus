@@ -1,6 +1,6 @@
 {
   "domain": "pysmaplus",
-  "name": "SMA Devices Plus (not for production use)",
+  "name": "SMA Devices Plus",
   "codeowners": ["@littleyoda", "@kellerza", "@rklomp"],
   "config_flow": true,
   "dependencies": ["network"],
