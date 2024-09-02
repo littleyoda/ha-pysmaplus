@@ -64,6 +64,8 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
     am = data[CONF_ACCESS]
     if am == "speedwire":
         am = "speedwireem"
+
+    _LOGGER.info(f"Creating new pysma-Device [Session: {(session is not None)}, Verify-SSL: {data[CONF_VERIFY_SSL]}, Url: {url}, User/Group: {data[CONF_GROUP]}, Accessmethod: {am}]")
     sma = pysma.getDevice(
         session,
         url,
