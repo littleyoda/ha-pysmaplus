@@ -289,6 +289,19 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             step_id="deviceselection", data_schema=data_schema, errors=errors
         )
 
+    def shortConfAcccess(self, access):
+        if (access == "speedwire" or access == "speedwireinv"):
+            return "sw"
+        if access == "webconnect":
+            return "wc"
+        if access == "ennexos":
+            return "en"
+        if access == "speedwireem":
+            return "em"
+        if access == "shm2":
+            return "ggc"
+        return "???"
+
     async def createEntry(self, device_info: DeviceInformation):
         """Create Entry based on device_info"""
         await self.async_set_unique_id(
@@ -300,6 +313,6 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         )
         self._abort_if_unique_id_configured(updates=self._data)
         return self.async_create_entry(
-            title=device_info.name + " (" + str(device_info.serial) + ")",
+            title=f"{device_info.name} ({self.shortConfAcccess(self._data[CONF_ACCESS])}{str(device_info.serial)})",
             data=self._data,
         )
