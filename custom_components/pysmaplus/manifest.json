@@ -9,6 +9,6 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/littleyoda/ha-pysmaplus/issues",
   "loggers": ["pysma"],
-  "requirements": ["pysma-plus>=0.3.11.9"],
-  "version": "0.4.2"
+  "requirements": ["pysma-plus>=0.3.11.16"],
+  "version": "0.4.3"
 }
