@@ -27,6 +27,7 @@ from .const import (
     PYSMA_DEVICE_INFO,
     PYSMA_DEVICEID,
 )
+
 LOGGER = logging.getLogger(__name__)
 
 ATTR_SCHEDULES = "schedules"
@@ -34,16 +35,13 @@ ATTR_TEMPERATURE = "temperature"
 ATTR_VEHICLE = "value"
 ATTR_WHEN = "when"
 
-# SERVICE_VEHICLE_SCHEMA = vol.Schema(
-#     {
-#         vol.Required(ATTR_VEHICLE): cv.string,
-#     }
-# )
-
 SERVICE_DISCOVERY = "run_discovery"
 SERVICE_SET_VALUE = "set_value"
 SERVICE_GET_VALUE_RANGE = "get_value_range"
-SERVICES = [SERVICE_SET_VALUE, SERVICE_DISCOVERY]  # , SERVICE_AC_START, SERVICE_CHARGE_SET_SCHEDULES]
+SERVICES = [
+    SERVICE_SET_VALUE,
+    SERVICE_DISCOVERY,
+]  
 
 
 def get_sensor_from_entityid(
@@ -101,10 +99,7 @@ def setup_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_SET_VALUE,
         set_value,
-        #        schema=SERVICE_XXX_SCHEMA,
-        #    supports_response=SupportsResponse.ONLY,
     )
-
 
     async def get_value_range(service_call: ServiceCall) -> ServiceResponse:
         """Return the allowed values."""
@@ -120,11 +115,8 @@ def setup_services(hass: HomeAssistant) -> None:
 
     hass.services.async_register(
         DOMAIN,
-        # SERVICE_AC_CANCEL,
-        # ac_cancel
         SERVICE_GET_VALUE_RANGE,
         get_value_range,
-        #        schema=SERVICE_XXX_SCHEMA,
         supports_response=SupportsResponse.ONLY,
     )
 
@@ -143,39 +135,31 @@ def setup_services(hass: HomeAssistant) -> None:
         ret = await pysma.discovery()
         if len(ret) == 0:
             debug["status"] = "Found no SMA devices via speedwire discovery request!"
-  #      debug["addr"] = ret
-
+        #      debug["addr"] = ret
 
         for r in ret:
-                z = {
-                   "addr": r[0],
-                   "port": r[1],
-                   "identify": []
-                }
-                debug["discovery"].append(z)
-               # print(r[0])
-                ident = await identify(r[0], False)
-                for i in ident:
-                    z["identify"].append({
-                            "access": i.access,
-                            "status": i.status,
-                            "tested_endpoints":  i.tested_endpoints,
-                            "exception": str(i.exception),
-                            "remark": i.remark,
-                            "device": i.device
-                    })
+            z = {"addr": r[0], "port": r[1], "identify": []}
+            debug["discovery"].append(z)
+            # print(r[0])
+            ident = await identify(r[0], False)
+            for i in ident:
+                z["identify"].append(
+                    {
+                        "access": i.access,
+                        "status": i.status,
+                        "tested_endpoints": i.tested_endpoints,
+                        "exception": str(i.exception),
+                        "remark": i.remark,
+                        "device": i.device,
+                    }
+                )
         LOGGER.info("PYSMA Discovery finisehd.")
 
-
-
         return debug
-    
+
     hass.services.async_register(
         DOMAIN,
-        # SERVICE_AC_CANCEL,
-        # ac_cancel
         SERVICE_DISCOVERY,
         discovery,
-        #        schema=SERVICE_XXX_SCHEMA,
         supports_response=SupportsResponse.ONLY,
     )

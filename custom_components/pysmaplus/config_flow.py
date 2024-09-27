@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict
-
+import json
 import homeassistant.helpers.config_validation as cv
 from pysmaplus.device import DeviceInformation
+from .helper import discoveryAndScan
 from . import getPysmaInstance
 import pysmaplus as pysma
 import voluptuous as vol
+import json
 from homeassistant import config_entries, core
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import (
@@ -25,6 +27,7 @@ from .const import (
     ACCESSLONG,
     CONF_ACCESS,
     CONF_ACCESSLONG,
+    CONF_DISCOVERY,
     CONF_GROUP,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
@@ -110,10 +113,9 @@ class PySMAOptionsConfigFlow(config_entries.OptionsFlow):
         return self.async_create_entry(title="", data={})
 
 
-
 class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Entry-Point for HomeAssistnat
-    
+
     Handle a config flow for SMA.
     Dialogs
     1. _user     Access Methode
@@ -128,8 +130,8 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         """Initialize."""
         self._data = {
             CONF_HOST: vol.UNDEFINED,
-            CONF_SSL: False,
-            CONF_VERIFY_SSL: True,
+            CONF_SSL: True,
+            CONF_VERIFY_SSL: False,
             CONF_ACCESS: ACCESS[0],
             CONF_GROUP: GROUPS[0],
             CONF_PASSWORD: vol.UNDEFINED,
@@ -138,6 +140,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         }
         self.listNames: list[str] = []
         self.listDeviceInfo: list[DeviceInformation] = []
+        self.discovery: dict[str, list] = {}
 
     @staticmethod
     @callback
@@ -183,7 +186,67 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             self._data[CONF_DEVICE] = ""
             return await self.async_step_deviceselection()
 
+        if deviceIdx == 5:
+            return await self.async_step_discovery()
+
         return self.async_abort(reason="not_supported")
+
+    async def async_step_discovery(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is None:
+            ret = await discoveryAndScan()
+            _LOGGER.error(json.dumps(ret))
+            errors: dict[str, str] = {}
+            self.discovery: dict[str, list] = {"data": [], "name": []}
+            # Fill self.dicovery this dicovery-data
+            for ip in ret["discovery"]:
+                for am in ip["identify"]:
+                    if am["status"] == "failed" or am["access"] == "shm2":
+                        continue
+                    am["addr"] = ip["addr"]
+                    am["accessidx"] = -1
+                    #                   access = am["access"]
+                    if am["access"] not in ACCESS:
+                        continue
+                    am["accessidx"] = ACCESS.index(am["access"])
+                    am["accessnice"] = ACCESSLONG[am["accessidx"]]
+
+                    self.discovery["name"].append(
+                        f'[{ip["addr"]}] {am["accessnice"]} {am["remark"]}'
+                    )
+                    self.discovery["data"].append(am)
+
+            if len(self.discovery["data"]) == 0:
+                return self.async_abort(reason="No SMA Device detected!")
+
+            data_schema = vol.Schema(
+                {
+                    vol.Required(
+                        CONF_DISCOVERY,
+                    ): vol.In(self.discovery["name"]),
+                }
+            )
+            return self.async_show_form(
+                step_id="discovery", data_schema=data_schema, errors=errors
+            )
+        amidx = self.discovery["name"].index(user_input[CONF_DISCOVERY])
+        am = self.discovery["data"][amidx]
+        self.config_data[CONF_ACCESSLONG] = ACCESSLONG[ACCESS.index(am["access"])]
+        self.config_data[CONF_DISCOVERY] = am
+
+        if ACCESS.index(am["access"]) == 3:
+            # EM/SHM2 do not require any further parameters.
+            self._data[CONF_HOST] = "localhost"
+            self._data[CONF_SSL] = False
+            self._data[CONF_VERIFY_SSL] = False
+            self._data[CONF_GROUP] = ""
+            self._data[CONF_PASSWORD] = ""
+            self._data[CONF_ACCESS] = am["access"]
+            self._data[CONF_DEVICE] = ""
+            return await self.async_step_deviceselection()
+
+        return await self.async_step_details()
 
     async def async_step_details(
         self, user_input: dict[str, Any] | None = None
@@ -192,6 +255,18 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         errors = {}
 
         deviceIdx = ACCESSLONG.index(self.config_data[CONF_ACCESSLONG])
+
+        if self.config_data and "discovery" in self.config_data:
+            # Default-Values based on discovery information
+            disc = self.config_data["discovery"]
+            self._data[CONF_HOST] = disc["addr"]
+            if disc["remark"] == "https":
+                self._data[CONF_SSL] = True
+                self._data[CONF_VERIFY_SSL] = False
+            if disc["remark"] == "http":
+                self._data[CONF_SSL] = False
+                self._data[CONF_VERIFY_SSL] = False
+
         if user_input is not None:
             self._data[CONF_HOST] = user_input.get(CONF_HOST)
             self._data[CONF_SSL] = user_input.get(CONF_SSL, True)
@@ -290,7 +365,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         )
 
     def shortConfAcccess(self, access):
-        if (access == "speedwire" or access == "speedwireinv"):
+        if access == "speedwire" or access == "speedwireinv":
             return "sw"
         if access == "webconnect":
             return "wc"
