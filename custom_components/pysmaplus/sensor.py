@@ -909,6 +909,10 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         key="operating_mode_plant_control",
         name="Operating Mode Plant Control",
     ),
+    "operating_mode": SensorEntityDescription(
+        key="operating_mode",
+        name="Operating Mode",
+    ),
     "power_setpoint_plant_control": SensorEntityDescription(
         key="power_setpoint_plant_control",
         name="Power Setpoint Plant Control",
