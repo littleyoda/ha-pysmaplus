@@ -260,10 +260,10 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             # Default-Values based on discovery information
             disc = self.config_data["discovery"]
             self._data[CONF_HOST] = disc["addr"]
-            if disc["remark"] == "https":
+            if "https" in disc["remark"]:
                 self._data[CONF_SSL] = True
                 self._data[CONF_VERIFY_SSL] = False
-            if disc["remark"] == "http":
+            if disc["remark"] == "http" or "http://" in disc["remark"]:
                 self._data[CONF_SSL] = False
                 self._data[CONF_VERIFY_SSL] = False
 
