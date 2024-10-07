@@ -125,12 +125,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_update_data():
         """Update the used SMA sensors."""
         try:
+            _LOGGER.info(f"Update pysma {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
             await sma.read(sensor_def, entry.data[CONF_DEVICE])
         except (
             pysma.exceptions.SmaReadException,
             pysma.exceptions.SmaConnectionException,
+            TimeoutError
         ) as exc:
+            _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
+            _LOGGER.warning(exc, exc_info=True)
             raise UpdateFailed(exc) from exc
+        except Exception as e:
+            _LOGGER.warning(f"Update Failed. Unfetched Exception {type(e)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
+
+
 
     interval = timedelta(
         seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
