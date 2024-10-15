@@ -2,6 +2,8 @@
 
 see [Supported Devices Page](supported_devices.md)
 
+# entities
+
 # How can I change the refresh rate?
 
 By default, the values are retrieved every 5 seconds. This time can be reduced to one second.
