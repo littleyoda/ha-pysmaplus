@@ -100,6 +100,28 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         device_class=SensorDeviceClass.POWER,
         entity_registry_enabled_default=False,
     ),
+    "pv_total_power_a": SensorEntityDescription(
+        key="pv_total_power_a",
+        name="PV Total Power A",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    "pv_total_power_b": SensorEntityDescription(
+        key="pv_total_power_b",
+        name="PV Total Power B",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    "pv_total_power_c": SensorEntityDescription(
+        key="pv_total_power_c",
+        name="PV Total Power C",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+        entity_registry_enabled_default=False,
+    ),
     "pv_voltage_a": SensorEntityDescription(
         key="pv_voltage_a",
         name="PV Voltage A",
@@ -916,6 +938,13 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "power_setpoint_plant_control": SensorEntityDescription(
         key="power_setpoint_plant_control",
         name="Power Setpoint Plant Control",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.POWER,
+    ),
+    "active_power_limitation_gcp": SensorEntityDescription(
+        key="active_power_limitation_gcp",
+        name="Active Power Limitation (GCP)",
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
