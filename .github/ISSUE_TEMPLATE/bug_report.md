@@ -19,6 +19,9 @@ Speedwire: [ ]
 Webconnect: [ ]
 EnnexOS-based: [ ]
 Energymeter/SHM2: [ ]
+SHM2 with Grid Guard Code: [ ]
+
+
 
 **List of the integrated SMA devices**
 Inverter:
