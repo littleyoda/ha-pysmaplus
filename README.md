@@ -11,6 +11,8 @@ This integration supports almost all SMA devices like inverters, hybrid inverter
 
 A list of devices that have been successfully tested can be found [here](https://github.com/littleyoda/pysma/blob/master/README.md)
 
+Please see also the [Frequently Asked Questions](https://github.com/littleyoda/ha-pysmaplus/blob/main/docs/faq.md).
+
 # Installation
 *   HACS must be installed
 *   You have to add my repository in HACS.
