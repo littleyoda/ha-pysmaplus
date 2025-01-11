@@ -12,7 +12,7 @@ What you can check:
 Three problem clusters have been observed so far:
 * SHM2 is in a different subnet than Home Assistant
 * Incorrect installation of HA in a Docker instance where the multicast packets are not forwarded.<br>I have not yet had any final feedback from users as to which option has helped them.
-    Inadequate cabling
+* Inadequate cabling
 
 Possible solutions:
 * Take care that Homeassisstnat is in the same subnet as the SHM/EM. 
