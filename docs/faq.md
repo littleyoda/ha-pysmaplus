@@ -2,8 +2,6 @@
 
 see [Supported Devices Page](supported_devices.md)
 
-# entities
-
 # How can I change the refresh rate?
 
 By default, the values are retrieved every 5 seconds. This time can be reduced to one second.
@@ -20,7 +18,7 @@ see [Set Parameter Page](set_parameter.md)
 # EM/SHM2: I do not receive multicast packets
 see [SHM2 Multicast](shm2_multicast.md)
 
-#Ennexos Interface: No sensors
+# Ennexos Interface: No sensors
 If a device is successfully added via the enneox-interface but no sensors are displayed, it is probably a new device for which the sensor information has not yet been stored.
 In this case, please send the [diagnostic information](diagnosticsinformation.md) for the device to the author.
 
