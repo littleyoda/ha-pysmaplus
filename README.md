@@ -24,3 +24,5 @@ Please see also the [Frequently Asked Questions](https://github.com/littleyoda/h
     (Settings / Devices & Services / Integrations)
 *   Not all entities are enabled
 *    automatically. You may have to enable them manually.
+
+You cannot install ha-pysmaplus as an addon. (This results in the following error: Https://github.com/littleyoda/ha-pysmaplus is not a valid add-on repository)
