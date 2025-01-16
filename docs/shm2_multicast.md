@@ -17,6 +17,7 @@ Three problem clusters have been observed so far:
 Possible solutions:
 * Take care that Homeassisstnat is in the same subnet as the SHM/EM.
 * In some cases, managed switches do not forward the SHM2 packets. In this case, it helps to reconfigure the switch (Expert) or to connect the SHM2 to an unmanaged switch.
+* (Easy) In some cases, the inverters also provide the values transmitted by the SHM2. In this case, sensors labelled ‘Metering’ should be available.
 * (Expert) Configure Docker appropriately
 * (Expert) Use the SHM-Grid Code Interface.<br>However, I do not recommend it, as it provides significantly less information than the multicast variant.
 * (Expert) Switch from multicast to unicast.<br>It must be ensured that every device that requires the information from the EM/SHM2 appears in the list. If more than 3 devices (including Home Assistant) require the information, this path is not possible.
