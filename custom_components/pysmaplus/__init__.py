@@ -30,6 +30,7 @@ from .const import (
     CONF_ACCESS,
     CONF_SCAN_INTERVAL,
     CONF_DEVICE,
+    CONF_RETRIES,
     DOMAIN,
     PLATFORMS,
     PYSMA_COORDINATOR,
@@ -75,6 +76,13 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
         groupuser=data[CONF_GROUP],
         accessmethod=am,
     )
+
+    # Options for Speedwire
+    if am == "speedwireinv":
+        retries = data.get(CONF_RETRIES, 0)
+        if (retries > 0):
+            _LOGGER.error(f"Login retries: {retries}") 
+            sma.set_options({"loginRetries": retries})
 
     # Adding Bindingaddresses for energy meter multicast
     if am == "speedwireem":

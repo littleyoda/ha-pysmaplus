@@ -19,6 +19,7 @@ CONF_ACCESS = "access"
 CONF_ACCESSLONG = "accesslong"
 CONF_DISCOVERY = "discovery"
 CONF_DEVICE = "device"
+CONF_RETRIES = "retries"
 CONF_SCAN_INTERVAL = "scaninterval"
 DEFAULT_SCAN_INTERVAL = 5
 

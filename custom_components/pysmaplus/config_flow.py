@@ -12,6 +12,7 @@ from . import getPysmaInstance
 import pysmaplus as pysma
 import voluptuous as vol
 import json
+from homeassistant.helpers import selector
 from homeassistant import config_entries, core
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import (
@@ -30,6 +31,7 @@ from .const import (
     CONF_DISCOVERY,
     CONF_GROUP,
     CONF_SCAN_INTERVAL,
+    CONF_RETRIES,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     GROUPS,
@@ -137,6 +139,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             CONF_PASSWORD: vol.UNDEFINED,
             CONF_DEVICE: vol.UNDEFINED,
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+            CONF_RETRIES: vol.UNDEFINED
         }
         self.listNames: list[str] = []
         self.listDeviceInfo: list[DeviceInformation] = []
@@ -275,6 +278,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             self._data[CONF_PASSWORD] = user_input.get(CONF_PASSWORD, "")
             self._data[CONF_ACCESS] = ACCESS[deviceIdx]
             self._data[CONF_DEVICE] = ""
+            self._data[CONF_RETRIES] = int(user_input.get(CONF_RETRIES, 0))
             return await self.async_step_deviceselection()
 
         if deviceIdx == 0:
@@ -285,6 +289,17 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                         GROUPS
                     ),
                     vol.Required(CONF_PASSWORD): cv.string,
+                    vol.Optional(
+                        CONF_RETRIES,
+                        default=3,
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            min=3,
+                            max=100,
+                            step=1,
+                            mode=selector.NumberSelectorMode.BOX,
+                        ),
+                    )
                 }
             )
         elif deviceIdx == 1:
