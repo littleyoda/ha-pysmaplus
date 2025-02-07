@@ -18,6 +18,26 @@ see [Set Parameter Page](set_parameter.md)
 # EM/SHM2: I do not receive multicast packets
 see [SHM2 Multicast](shm2_multicast.md)
 
+# Speedwire (Inverter and battery storage)
+SMA does not provide any freely available documentation for speedwire in connection with inverters and battery storage. Therefore, the entire implementation has been created by reverse engineering and cannot cover all cases.
+
+## No measured values overnight
+Some inverters do not respond to Speedwire requests at night and the integration reports an error. Actually, the error management of HA should ensure that the queries continue to run and that everything works normally again after sunrise.
+But sometimes the integration has to be restarted in the morning manually.
+
+Cause: unclear
+
+## No connection via Speedwire
+Sometimes inverters that support Speedwire cannot be queried at all. 
+
+Cause: unclear
+
+## Lost connections
+Sometimes the integration does not deliver any measured values until the integration is restarted. This can happen during the day, but more often after an HA restart.
+
+Cause: unclear
+
+
 # Ennexos Interface: No sensors
 If a device is successfully added via the enneox-interface but no sensors are displayed, it is probably a new device for which the sensor information has not yet been stored.
 In this case, please send the [diagnostic information](diagnosticsinformation.md) for the device to the author.
