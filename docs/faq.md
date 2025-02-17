@@ -2,13 +2,17 @@
 
 see [Supported Devices Page](supported_devices.md)
 
-# entities
-
 # How can I change the refresh rate?
 
 By default, the values are retrieved every 5 seconds. This time can be reduced to one second.
 
 However, the HA developers warn against low refresh rates, as they can overload older or slower systems. The update speed should only be reduced gradually and carefully.
+
+# Speedwire (Inverter and battery storage)
+SMA does not provide any freely available documentation for speedwire in connection with inverters and battery storage. Therefore, the entire implementation has been created by reverse engineering and cannot cover all cases.
+
+see [Known Speedwire Problems](speedwire.md)
+
 
 # How can create dashboard?
 see [Dashboard Page](dashboard.md)
@@ -19,26 +23,6 @@ see [Set Parameter Page](set_parameter.md)
 
 # EM/SHM2: I do not receive multicast packets
 see [SHM2 Multicast](shm2_multicast.md)
-
-# Speedwire (Inverter and battery storage)
-SMA does not provide any freely available documentation for speedwire in connection with inverters and battery storage. Therefore, the entire implementation has been created by reverse engineering and cannot cover all cases.
-
-## No measured values overnight
-Some inverters do not respond to Speedwire requests at night and the integration reports an error. Actually, the error management of HA should ensure that the queries continue to run and that everything works normally again after sunrise.
-But sometimes the integration has to be restarted in the morning manually.
-
-Cause: unclear
-
-## No connection via Speedwire
-Sometimes inverters that support Speedwire cannot be queried at all. 
-
-Cause: unclear
-
-## Lost connections
-Sometimes the integration does not deliver any measured values until the integration is restarted. This can happen during the day, but more often after an HA restart.
-
-Cause: unclear
-
 
 # Ennexos Interface: No sensors
 If a device is successfully added via the enneox-interface but no sensors are displayed, it is probably a new device for which the sensor information has not yet been stored.
@@ -62,3 +46,17 @@ template:
         unit_of_measurement: "W"
         state_class: measurement
 ```
+
+# Daily production
+Not all inverters report the daily production as a sensor value.
+
+The daily production can either be calculated using the Home Assistant [Energy Dashboard](dashboard.md) or using [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) in the configurations.yaml, if the value is needed as a sensor.
+
+```
+utility_meter:
+  energy:
+    name: Tageserzeugung
+    source: sensor.sunny_tripower_x_15_total_yield
+    cycle: daily    
+```
+
