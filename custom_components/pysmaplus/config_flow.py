@@ -139,7 +139,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             CONF_PASSWORD: vol.UNDEFINED,
             CONF_DEVICE: vol.UNDEFINED,
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
-            CONF_RETRIES: vol.UNDEFINED
+            CONF_RETRIES: 0
         }
         self.listNames: list[str] = []
         self.listDeviceInfo: list[DeviceInformation] = []
