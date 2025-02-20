@@ -105,7 +105,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         name="PV Total Power A",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
     "pv_total_power_b": SensorEntityDescription(
@@ -113,7 +113,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         name="PV Total Power B",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
     "pv_total_power_c": SensorEntityDescription(
@@ -121,7 +121,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         name="PV Total Power C",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
     "pv_voltage_a": SensorEntityDescription(
