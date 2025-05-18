@@ -16,14 +16,13 @@ Please see also the [Frequently Asked Questions](https://github.com/littleyoda/h
 
 # Installation
 *   HACS must be installed
-*   You have to add my repository in HACS.
-    https://github.com/littleyoda/ha-pysmaplus
 * Then add the following integration via HACS
     SMA Devices Plus
 * Restart HA
 *  Add your SMA devices based on the SMA Device Plus integration.
     (Settings / Devices & Services / Integrations)
-*   Not all entities are enabled
-*    automatically. You may have to enable them manually.
+*   Not all entities are enabled automatically. You may have to enable them manually.
 
-You cannot install ha-pysmaplus as an addon. (This results in the following error: Https://github.com/littleyoda/ha-pysmaplus is not a valid add-on repository)
+The Speedwire option does not work with every inverter.
+
+
