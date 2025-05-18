@@ -1028,7 +1028,7 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if (self._sensor == "nan"):
+        if (self._sensor.value == "nan"):
             return None
         return self._sensor.value
 
