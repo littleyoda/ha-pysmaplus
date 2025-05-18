@@ -1028,6 +1028,8 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
+        if (self._sensor == "nan"):
+            return None
         return self._sensor.value
 
     async def async_added_to_hass(self) -> None:
