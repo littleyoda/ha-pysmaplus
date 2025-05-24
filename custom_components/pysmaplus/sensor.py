@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import math
 import pysmaplus as pysma
 
 from homeassistant.components.sensor import (
@@ -1028,9 +1029,14 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if (self._sensor.value == "nan"):
+        value = self._sensor.value
+        if isinstance(value, str) and value.lower() == "nan":
             return None
-        return self._sensor.value
+        if isinstance(value, float):
+            if math.isnan(value) or not math.isfinite(value):
+                return None
+        return value
+
 
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
