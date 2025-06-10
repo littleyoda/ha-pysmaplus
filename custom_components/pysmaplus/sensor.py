@@ -1038,6 +1038,12 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
                 return None
         return value
 
+    @property
+    def extra_state_attributes(self):
+        return {
+            "textrepr": self._sensor.mapped_value if self._sensor.mapped_value else "",
+        }
+
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
         await super().async_added_to_hass()
