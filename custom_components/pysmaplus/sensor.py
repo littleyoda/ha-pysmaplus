@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import math
 import pysmaplus as pysma
+
+import math
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -105,7 +106,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         key="pv_total_power_a",
         name="PV Total Power A",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
@@ -113,7 +114,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         key="pv_total_power_b",
         name="PV Total Power B",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
@@ -121,7 +122,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         key="pv_total_power_c",
         name="PV Total Power C",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.ENERGY,
         suggested_display_precision=2,
     ),
@@ -1036,7 +1037,6 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
             if math.isnan(value) or not math.isfinite(value):
                 return None
         return value
-
 
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
