@@ -60,4 +60,3 @@ utility_meter:
     source: sensor.sunny_tripower_x_15_total_yield
     cycle: daily    
 ```
-
