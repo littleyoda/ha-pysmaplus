@@ -2,6 +2,8 @@
 
 see [Supported Devices Page](supported_devices.md)
 
+# entities
+
 # How can I change the refresh rate?
 
 By default, the values are retrieved every 5 seconds. This time can be reduced to one second.
@@ -12,7 +14,6 @@ However, the HA developers warn against low refresh rates, as they can overload 
 SMA does not provide any freely available documentation for speedwire in connection with inverters and battery storage. Therefore, the entire implementation has been created by reverse engineering and cannot cover all cases.
 
 see [Known Speedwire Problems](speedwire.md)
-
 
 # How can create dashboard?
 see [Dashboard Page](dashboard.md)
