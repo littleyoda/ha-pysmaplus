@@ -66,9 +66,8 @@ async def validate_input(
 class PySMAOptionsConfigFlow(config_entries.OptionsFlow):
     """Handle a pyscript options flow."""
 
-    def __init__(self, config_entry: ConfigEntry) -> None:
+    def __init__(self) -> None:
         """Initialize pyscript options flow."""
-        self.config_entry = config_entry
         self._show_form = False
 
     async def async_step_init(
@@ -147,9 +146,9 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> PySMAOptionsConfigFlow:
+    def async_get_options_flow() -> PySMAOptionsConfigFlow:
         """Get the options flow for this handler."""
-        return PySMAOptionsConfigFlow(config_entry)
+        return PySMAOptionsConfigFlow()
 
     # "User" => 0,1,2,4 => details => selection
     #        => 3 => selection
