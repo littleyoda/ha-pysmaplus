@@ -28,5 +28,9 @@ Inverter:
 Energymeter:
 Sunny Home Manager 2:
 
+**Discvoery Information**
+Please add the information from a discovery run.
+![Discovery Run](https://raw.githubusercontent.com/littleyoda/ha-pysmaplus/refs/heads/main/docs/images/Run%20Discovery.png)
+
 **Screenshots and Diagnose Information**
 If applicable, add screenshots to help explain your problem and send the [Diagnose Information](https://raw.githubusercontent.com/littleyoda/ha-pysmaplus/main/docs/Diagnose-Information.png) to the developer. (E-Mail can be found here: https://littleyoda.github.io/)
