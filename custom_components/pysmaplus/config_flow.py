@@ -173,12 +173,12 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             )
 
         deviceIdx = ACCESSLONG.index(user_input[CONF_ACCESSLONG])
-        if deviceIdx in [0, 1, 2, 4]:
+        if deviceIdx in [1, 2, 3, 5, 6]:
             self.config_data.update(user_input)
             # Return the form of the next step
             return await self.async_step_details()
 
-        if deviceIdx == 3:
+        if deviceIdx == 4:
             # EM/SHM2 do not require any further parameters.
             self._data[CONF_HOST] = "localhost"
             self._data[CONF_SSL] = False
@@ -189,7 +189,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             self._data[CONF_DEVICE] = ""
             return await self.async_step_deviceselection()
 
-        if deviceIdx == 5:
+        if deviceIdx == 0:
             return await self.async_step_discovery()
 
         return self.async_abort(reason="not_supported")
@@ -238,7 +238,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
         self.config_data[CONF_ACCESSLONG] = ACCESSLONG[ACCESS.index(am["access"])]
         self.config_data[CONF_DISCOVERY] = am
 
-        if ACCESS.index(am["access"]) == 3:
+        if ACCESS.index(am["access"]) == 4:
             # EM/SHM2 do not require any further parameters.
             self._data[CONF_HOST] = "localhost"
             self._data[CONF_SSL] = False
@@ -281,7 +281,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             self._data[CONF_RETRIES] = int(user_input.get(CONF_RETRIES, 0))
             return await self.async_step_deviceselection()
 
-        if deviceIdx == 0:
+        if deviceIdx == 1:
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
@@ -302,7 +302,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                     )
                 }
             )
-        elif deviceIdx == 1:
+        elif deviceIdx == 2:
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
@@ -316,7 +316,7 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
             )
-        elif deviceIdx == 2:
+        elif deviceIdx == 3:
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
@@ -324,13 +324,23 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
             )
-        elif deviceIdx == 4:
+        elif deviceIdx == 5:
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
                     vol.Required(CONF_PASSWORD): cv.string,
                 }
             )
+        elif deviceIdx == 6:
+            data_schema = vol.Schema(
+                {
+                    vol.Required(CONF_HOST, default=self._data[CONF_HOST]): cv.string,
+                    vol.Required(CONF_GROUP, default=self._data[CONF_GROUP]): vol.In(
+                        GROUPS
+                    ),
+                    vol.Required(CONF_PASSWORD): cv.string,
+                }
+            )           
         else:
             errors["base"] = "unknown_device"
 
@@ -390,6 +400,8 @@ class SmaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             return "em"
         if access == "shm2":
             return "ggc"
+        if access == "speedwireV2":
+            return "sw2"
         return "???"
 
     async def createEntry(self, device_info: DeviceInformation):

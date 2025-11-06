@@ -24,12 +24,13 @@ CONF_SCAN_INTERVAL = "scaninterval"
 DEFAULT_SCAN_INTERVAL = 5
 
 GROUPS = ["user", "installer"]
-ACCESS = ["speedwireinv", "webconnect", "ennexos", "speedwireem", "shm2", "discovery"]
+ACCESS = ["discovery", "speedwireinv", "webconnect", "ennexos", "speedwireem", "shm2", "speedwireinvV2"]
 ACCESSLONG = [
-    "SMA Devices with Speedwire",
-    "SMA Devices with Webconnect",
-    "SMA Devices with EnnexOS (e.g. Tripower X Serie)",
-    "SMA Energy Meter / Sunny Home Manager 2.0",
-    "Sunny Home Manager 2 with Grid Guard Code",
-    "Discovery Modus",
+    "Discovery Modus", #0
+    "SMA Devices with Speedwire", #1
+    "SMA Devices of the Webconnect-Generation", #2
+    "SMA Devices with EnnexOS (e.g. Tripower X Serie)", #3
+    "SMA Energy Meter / Sunny Home Manager 2.0", #4
+    "Sunny Home Manager 2 with Grid Guard Code", #5
+    "SMA Devices with Speedwire V2 (Beta-Testing)", #6
 ]

@@ -50,7 +50,7 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
     """Returns a pysma Instance"""
     url = None
     session = None
-    if data[CONF_ACCESS] == "speedwireinv":
+    if data[CONF_ACCESS] == "speedwireinv" or data[CONF_ACCESS] == "speedwireinvV2":
         url = data[CONF_HOST]
     elif data[CONF_ACCESS] == "webconnect":
         protocol = "https" if data[CONF_SSL] else "http"
