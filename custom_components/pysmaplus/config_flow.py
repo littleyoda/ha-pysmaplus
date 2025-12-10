@@ -63,12 +63,12 @@ async def validate_input(
     return device_list, errors
 
 
-class PySMAOptionsConfigFlow(config_entries.OptionsFlow):
+class PySMAOptionsConfigFlow(config_entries.OptionsFlowWithConfigEntry):
     """Handle a pyscript options flow."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize pyscript options flow."""
-        self.config_entry = config_entry
+        super().__init__(config_entry)
         self._show_form = False
 
     async def async_step_init(
