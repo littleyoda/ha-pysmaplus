@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/littleyoda/ha-pysmaplus/issues",
   "loggers": ["pysma"],
   "requirements": ["pysma-plus>=0.3.24"],
-  "version": "0.5.1"
+  "version": "0.5.2"
 }
