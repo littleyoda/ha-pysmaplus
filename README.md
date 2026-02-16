@@ -15,13 +15,13 @@ Please see also the [Frequently Asked Questions](https://github.com/littleyoda/h
 [Frequently Asked Questions](https://github.com/littleyoda/pysma/blob/master/doc/faq_DE.md) of the underlying library.
 
 # Installation
-*   HACS must be installed
-* Then add the following integration via HACS
-    SMA Devices Plus
+*   [HACS](https://www.hacs.xyz/) must be installed
+* Then add the following integration via HACS "SMA Devices Plus"
 * Restart HA
-*  Add your SMA devices based on the SMA Device Plus integration.
+* Add your SMA devices based on the SMA Device Plus integration.
     (Settings / Devices & Services / Integrations)
-*   Not all entities are enabled automatically. You may have to enable them manually.
+* The Webconnect or Enneox options should be used for inverters. Speedwire can be used for older devices. Speedwire V2 is a fallback solution if all other solutions fail. 
+* Not all entities are enabled automatically. You may have to enable them manually.
 
 The Speedwire option does not work with every inverter.
 
