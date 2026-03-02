@@ -53,6 +53,8 @@ async def validate_input(
         await sma.close_session()
     except pysma.exceptions.SmaConnectionException:
         errors["base"] = "cannot_connect"
+    except pysma.exceptions.SmaMulticastReceiveException:
+        errors["base"] = "no_multicast"
     except pysma.exceptions.SmaAuthenticationException:
         errors["base"] = "invalid_auth"
     except pysma.exceptions.SmaReadException:

@@ -12,7 +12,8 @@
             "cannot_connect": "Failed to connect. Please check hostname/ip.",
             "cannot_retrieve_device_info": "Successfully connected, but unable to retrieve the device information",
             "invalid_auth": "Invalid authentication. Please check user/group and password.",
-            "unknown": "Unexpected error"
+            "unknown": "Unexpected error",
+            "no_multicast": "No data packet was received. Please check your network connection."
         },
         "step": {
             "user": {
