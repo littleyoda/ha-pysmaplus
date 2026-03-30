@@ -1,10 +1,23 @@
-With some devices, it is possible to change selected parameters via Service Call.
+With some devices, it is possible to change selected parameters via Actions (previously called 'Service Call'). 
+<br />
+Navigate to Settings - Actions - Get Settings, and select the entity.
 
 
 Before changing a value, you should first check which values are allowed:
+<br />
 <img valign="top" src="images/get_settings.png" width="50%"/>
 
+The parameter should return 'editable: true' and the allowed values, e.g.:
+
+    typ: min/max
+    values:
+      - 0
+      - 10000
+    names: {}
+    editable: true
+
 After that, you can change the parameter at your own risk:
+<br />
 <img valign="top" src="images/set_parameter.png" width="50%"/>
 
 # Temporary zero feed-in
