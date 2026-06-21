@@ -8,7 +8,11 @@ see [Supported Devices Page](supported_devices.md)
 
 By default, the values are retrieved every 5 seconds. This time can be reduced to one second.
 
+<img src="images/RefreshRate.png" width="50%"/>
+<img src="images/RefreshRate2.png" width="50%"/>
+
 However, the HA developers warn against low refresh rates, as they can overload older or slower systems. The update speed should only be reduced gradually and carefully.
+
 
 # Speedwire (Inverter and battery storage)
 SMA does not provide any freely available documentation for speedwire in connection with inverters and battery storage. Therefore, the entire implementation has been created by reverse engineering and cannot cover all cases.
