@@ -124,7 +124,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         configuration_url=None,
         identifiers={(DOMAIN, entry.unique_id)},
         manufacturer=sma_device_info.manufacturer,
-        model=sma_device_info.type,
+        model=str(sma_device_info.type),
         name=sma_device_info.name,
         sw_version=sma_device_info.sw_version,
     )
