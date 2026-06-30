@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import pysmaplus as pysma
 
+import logging
 import math
 
 from homeassistant.components.sensor import (
@@ -14,7 +15,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
@@ -27,7 +28,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfReactivePower,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -40,9 +41,12 @@ from .const import (
     DOMAIN,
     PYSMA_COORDINATOR,
     PYSMA_DEVICE_INFO,
+    PYSMA_OBJECT,
     PYSMA_SENSORS,
     PYSMA_ENTITIES,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "status": SensorEntityDescription(
@@ -967,9 +971,32 @@ async def async_setup_entry(
     coordinator = sma_data[PYSMA_COORDINATOR]
     used_sensors = sma_data[PYSMA_SENSORS]
     device_info = sma_data[PYSMA_DEVICE_INFO]
+    sma = sma_data[PYSMA_OBJECT]
 
     if TYPE_CHECKING:
         assert config_entry.unique_id
+
+    unique_id = config_entry.unique_id
+
+    # Track which channels already have an entity, so dynamic re-discovery never
+    # creates a duplicate.
+    #
+    # ``known_keys`` is the primary guard, keyed by Sensor.key, because both the
+    # live session mapping (``_AsyncSpeedwireSession.sensors``) and pysma
+    # ``read()`` match on Sensor.key. It is seeded from EVERY sensor already in
+    # the snapshot (not only the supported/entity-bearing ones): a key that the
+    # snapshot already holds under some other name must never be re-added by the
+    # listener, or ``Sensors.add()`` would create a second entry for that key.
+    #
+    # ``known_names`` is an extra guard, keyed by Sensor.name. A late-arriving
+    # channel must never reuse a name that already has an entity, because
+    # ``Sensors.add()`` REMOVES the existing same-name sensor object from the
+    # collection (verified in pysma/sensor.py Sensors.add) -- that would orphan
+    # the existing entity (read() would stop updating its now-detached Sensor).
+    known_keys: set[str] = {
+        key for sensor in used_sensors if (key := getattr(sensor, "key", None))
+    }
+    known_names: set[str] = set()
 
     entities = []
     for sensor in used_sensors:
@@ -977,15 +1004,171 @@ async def async_setup_entry(
             entities.append(
                 SMAsensor(
                     coordinator,
-                    config_entry.unique_id,
+                    unique_id,
                     SENSOR_ENTITIES.get(sensor.name),
                     device_info,
                     sensor,
                 )
             )
+            known_names.add(sensor.name)
 
     async_add_entities(entities)
-    sma_data[PYSMA_ENTITIES] = entities
+    # ``used_sensors`` IS the PYSMA_SENSORS collection (read() iterates it); keep
+    # a single, shared list of live entities in PYSMA_ENTITIES (services.py reads
+    # it fresh from hass.data on every call). Reuse the existing list object if
+    # one is present so any holder keeps seeing the current entity set.
+    entity_list = sma_data.get(PYSMA_ENTITIES)
+    if isinstance(entity_list, list):
+        entity_list.clear()
+        entity_list.extend(entities)
+    else:
+        entity_list = entities
+        sma_data[PYSMA_ENTITIES] = entity_list
+
+    @callback
+    def _async_discover_new_sensors() -> None:
+        """Add entities for supported sensors that appeared after setup.
+
+        Runs on every coordinator update. When a Speedwire V2 inverter wakes up
+        (e.g. at sunrise after a night-time restart) its live session regains
+        the instantaneous channels (grid_power, pv_power_a/b, frequency, ...)
+        that were missing from the one-time ``get_sensors()`` snapshot. The
+        frozen snapshot and the entity set created at setup never catch up on
+        their own, so those entities stay unavailable until a manual reload.
+
+        For each newly seen, supported channel we add a copy of its Sensor into
+        the PYSMA_SENSORS collection that ``read()`` iterates, then wrap that
+        very copy in a new entity so it receives live values on every poll.
+
+        Strategy: obtain the live sensor set through the no-poll
+        ``current_sensors()`` accessor monkeypatched onto the Speedwire V2
+        device class by ``_speedwire2_patch``. It is resolved defensively with
+        ``getattr``: for any device type that does not provide it (webconnect,
+        ennexos, em, shm2, speedwire) this is a safe no-op -- those device types
+        already discover their full sensor set up front. The accessor performs
+        no network I/O; it just reflects the mapping last refreshed by
+        ``read()`` on each coordinator update.
+
+        AddEntitiesCallback here is the schedule-a-task variant; calling it
+        from a @callback is intentional and non-blocking. This whole body is
+        wrapped in try/except so it can never raise inside async_update_listeners
+        (which has no per-listener guard) and break the coordinator.
+        """
+        try:
+            # Do not touch a half-torn-down entry. The unsubscribe registered
+            # via async_on_unload only runs AFTER async_unload_platforms, so a
+            # refresh that completes during unload could otherwise fire this
+            # listener against state that is being closed.
+            if config_entry.state is not ConfigEntryState.LOADED:
+                return
+
+            accessor = getattr(sma, "current_sensors", None)
+            if accessor is None:
+                # Device type without the no-poll accessor. Safe no-op.
+                return
+            try:
+                live_sensors = accessor()
+            except Exception:  # noqa: BLE001 - defensive, never break a poll
+                _LOGGER.debug(
+                    "pysmaplus dynamic discovery: accessor failed", exc_info=True
+                )
+                return
+            if not live_sensors:
+                return
+
+            new_entities: list[SMAsensor] = []
+            # Snapshot the list: the library mutates the underlying mapping from
+            # its polling coroutine. ``current_sensors()`` already returns a
+            # fresh list, but iterate over a local copy to be safe.
+            for live_sensor in list(live_sensors):
+                key = getattr(live_sensor, "key", None)
+                if key is None or key in known_keys:
+                    continue
+                name = getattr(live_sensor, "name", None)
+                if not name or name not in SENSOR_ENTITIES:
+                    # Unknown / unsupported channel (no entity description).
+                    # Mark the key handled so it is not re-scanned every cycle.
+                    if key is not None:
+                        known_keys.add(key)
+                    continue
+                if name in known_names:
+                    # Never shadow an existing entity's name (would orphan it via
+                    # Sensors.add name-replacement); mark the key as handled so
+                    # we do not reconsider it every cycle.
+                    _LOGGER.debug(
+                        "pysmaplus dynamic discovery: name %s already has an "
+                        "entity; not adding key %s",
+                        name,
+                        key,
+                    )
+                    known_keys.add(key)
+                    continue
+
+                # Add a copy into the snapshot collection read() iterates, then
+                # fetch the stored copy back (Sensors.add() stores a copy.copy,
+                # not the object passed in) and wrap THAT exact object so the
+                # entity and read() share one Sensor instance.
+                #
+                # ``used_sensors[key]`` (pysma __getitem__) returns the first
+                # sensor matching name OR key. This is unambiguous because no
+                # speedwire channel's name equals another channel's key (and the
+                # known_names/known_keys guards above prevent re-adding an
+                # existing one). The ``stored.key == key`` assertion below
+                # converts any future violation of that invariant into a logged
+                # no-op rather than a silent mis-wire to the wrong channel.
+                used_sensors.add(live_sensor)
+                try:
+                    stored = used_sensors[key]
+                except KeyError:
+                    _LOGGER.debug(
+                        "pysmaplus dynamic discovery: %s missing after add", key
+                    )
+                    continue
+                if getattr(stored, "key", None) != key:
+                    _LOGGER.warning(
+                        "pysmaplus dynamic discovery: lookup for %s returned %s; "
+                        "skipping to avoid mis-wiring an entity",
+                        key,
+                        getattr(stored, "key", None),
+                    )
+                    known_keys.add(key)
+                    continue
+
+                entity = SMAsensor(
+                    coordinator,
+                    unique_id,
+                    SENSOR_ENTITIES.get(name),
+                    device_info,
+                    stored,
+                )
+                new_entities.append(entity)
+                known_keys.add(key)
+                known_names.add(name)
+
+            if new_entities:
+                _LOGGER.info(
+                    "pysmaplus: discovered %d new sensor(s) at runtime: %s",
+                    len(new_entities),
+                    ", ".join(sorted(e._sensor.key for e in new_entities)),
+                )
+                # Schedule-a-task variant of AddEntitiesCallback: safe to call
+                # from this @callback. New entities carry disjoint unique_ids
+                # from the initial batch (guarded by known_keys), so they cannot
+                # double-add.
+                async_add_entities(new_entities)
+                entity_list.extend(new_entities)
+        except Exception:  # noqa: BLE001 - must never break coordinator updates
+            _LOGGER.exception("pysmaplus dynamic sensor discovery failed")
+
+    # Run once now so a channel already present in the first poll (but absent
+    # from the snapshot due to an earlier night-time discovery) is picked up
+    # without waiting for the next coordinator tick.
+    _async_discover_new_sensors()
+
+    # Re-run on every coordinator update; unsubscribe on unload/reload.
+    config_entry.async_on_unload(
+        coordinator.async_add_listener(_async_discover_new_sensors)
+    )
 
 
 class SMAsensor(CoordinatorEntity, SensorEntity):
