@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+Bug reports generated solely using `ai` are prohibited due to their poor quality.
+
+
 Used Version of Home Assistant:
 Used Version of ha-pysmaplus
 
