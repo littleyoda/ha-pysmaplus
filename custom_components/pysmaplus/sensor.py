@@ -1041,11 +1041,11 @@ async def async_setup_entry(
         very copy in a new entity so it receives live values on every poll.
 
         Strategy: obtain the live sensor set through the no-poll
-        ``current_sensors()`` accessor monkeypatched onto the Speedwire V2
-        device class by ``_speedwire2_patch``. It is resolved defensively with
-        ``getattr``: for any device type that does not provide it (webconnect,
-        ennexos, em, shm2, speedwire) this is a safe no-op -- those device types
-        already discover their full sensor set up front. The accessor performs
+        ``current_sensors()`` accessor that pysma-plus >= 0.4.5 provides on the
+        Speedwire V2 device class. It is resolved defensively with ``getattr``:
+        for any device type (or an older library) that does not provide it
+        (webconnect, ennexos, em, shm2, speedwire) this is a safe no-op --
+        those device types already discover their full sensor set up front. The accessor performs
         no network I/O; it just reflects the mapping last refreshed by
         ``read()`` on each coordinator update.
 
@@ -1058,8 +1058,14 @@ async def async_setup_entry(
             # Do not touch a half-torn-down entry. The unsubscribe registered
             # via async_on_unload only runs AFTER async_unload_platforms, so a
             # refresh that completes during unload could otherwise fire this
-            # listener against state that is being closed.
-            if config_entry.state is not ConfigEntryState.LOADED:
+            # listener against state that is being closed. SETUP_IN_PROGRESS
+            # must pass: the entry only becomes LOADED after the component's
+            # async_setup_entry returns, so the eager call below runs while
+            # setup is still in progress.
+            if config_entry.state not in (
+                ConfigEntryState.LOADED,
+                ConfigEntryState.SETUP_IN_PROGRESS,
+            ):
                 return
 
             accessor = getattr(sma, "current_sensors", None)
