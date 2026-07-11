@@ -99,9 +99,9 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sma from a config entry."""
-    # Init the SMA interface
-    sma = await getPysmaInstance(hass, entry.data)
     try:
+        # Init the SMA interface (getPysmaInstance already opens a session)
+        sma = await getPysmaInstance(hass, entry.data)
         # Start seession/Test connection
         await sma.new_session()
         # Get updated device info
@@ -112,6 +112,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except (
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,
+        TimeoutError,
     ) as exc:
         raise ConfigEntryNotReady from exc
 
