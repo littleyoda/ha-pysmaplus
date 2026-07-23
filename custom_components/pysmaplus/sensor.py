@@ -1068,7 +1068,7 @@ async def async_setup_entry(
             ):
                 return
 
-            accessor = getattr(sma, "current_sensors", None)
+            accessor = getattr(sma, "known_sensors", None) or getattr(sma, "current_sensors", None)
             if accessor is None:
                 # Device type without the no-poll accessor. Safe no-op.
                 return
