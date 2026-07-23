@@ -968,12 +968,20 @@ async def async_setup_entry(
     used_sensors = sma_data[PYSMA_SENSORS]
     device_info = sma_data[PYSMA_DEVICE_INFO]
 
+    sma = sma_data[PYSMA_OBJECT]
+
     if TYPE_CHECKING:
         assert config_entry.unique_id
 
+    known_keys: set[str] = set()
+    known_names: set[str] = set()
+
     entities = []
     for sensor in used_sensors:
+        if sensor.key is not None:
+            known_keys.add(sensor.key)
         if sensor.name in SENSOR_ENTITIES:
+            known_names.add(sensor.name)
             entities.append(
                 SMAsensor(
                     coordinator,
@@ -986,6 +994,16 @@ async def async_setup_entry(
 
     async_add_entities(entities)
     sma_data[PYSMA_ENTITIES] = entities
+
+    _async_setup_dynamic_discovery(
+        hass,
+        config_entry,
+        coordinator,
+        sma,
+        known_keys,
+        known_names,
+        async_add_entities,
+    )
 
 
 class SMAsensor(CoordinatorEntity, SensorEntity):
@@ -1053,3 +1071,79 @@ class SMAsensor(CoordinatorEntity, SensorEntity):
         """Run when entity will be removed from hass."""
         await super().async_will_remove_from_hass()
         self._sensor.enabled = False
+
+
+@callback
+def _async_setup_dynamic_discovery(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    coordinator: DataUpdateCoordinator,
+    sma: Any,
+    known_keys: set[str],
+    known_names: set[str],
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Register a coordinator update listener that dynamically discovers new sensors.
+
+    When Home Assistant starts or reloads while an inverter is asleep (e.g. at
+    night), the initial get_sensors() snapshot contains only static registers.
+    As soon as the device wakes up at sunrise, read() populates the newly
+    active channels. This listener checks known_sensors() on each update
+    and adds entities for any newly active channels without requiring a manual
+    reload.
+    """
+    accessor = getattr(sma, "known_sensors", None) or getattr(sma, "current_sensors", None)
+    if accessor is None:
+        return
+
+    @callback
+    def _async_check_new_sensors() -> None:
+        if config_entry.state is not ConfigEntryState.LOADED:
+            return
+
+        try:
+            live_sensors = accessor()
+        except Exception:  # noqa: BLE001 - defensive
+            _LOGGER.debug("pysmaplus dynamic discovery: accessor failed", exc_info=True)
+            return
+
+        if not live_sensors:
+            return
+
+        new_entities: list[SMAsensor] = []
+        for live_sensor in list(live_sensors):
+            key = getattr(live_sensor, "key", None)
+            if key is None or key in known_keys:
+                continue
+
+            name = getattr(live_sensor, "name", None)
+            if not name or name not in SENSOR_ENTITIES:
+                if key is not None:
+                    known_keys.add(key)
+                continue
+
+            if name in known_names:
+                known_keys.add(key)
+                continue
+
+            entity_description = SENSOR_ENTITIES[name]
+            known_keys.add(key)
+            known_names.add(name)
+
+            entity = SMAsensor(
+                coordinator,
+                sma,
+                live_sensor,
+                entity_description,
+                config_entry.data[CONF_DEVICE],
+            )
+            new_entities.append(entity)
+
+        if new_entities:
+            _LOGGER.info(
+                "pysmaplus dynamic discovery: adding %d new entity/entities at runtime",
+                len(new_entities),
+            )
+            async_add_entities(new_entities)
+
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_check_new_sensors))
