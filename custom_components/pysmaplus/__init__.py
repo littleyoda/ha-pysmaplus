@@ -159,6 +159,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name="pysmaplus",
         update_method=async_update_data,
         update_interval=interval,
+        always_update=True,
     )
 
     try:
