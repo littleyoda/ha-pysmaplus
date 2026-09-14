@@ -137,6 +137,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             _LOGGER.info(f"Update pysma {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
             await sma.read(sensor_def, entry.data[CONF_DEVICE])
         except (
+            pysma.exceptions.SmaAuthenticationException,
             pysma.exceptions.SmaReadException,
             pysma.exceptions.SmaConnectionException,
             TimeoutError
