@@ -957,6 +957,37 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
     ),
+   "backup_mode_status": SensorEntityDescription(
+        key="backup_mode_status",
+        name="Backup mode status",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    "current_battery_capacity": SensorEntityDescription(
+        key="current_battery_capacity",
+        name="Current battery capacity",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.BATTERY,
+        entity_registry_enabled_default=False,
+    ),
+    "remaining_available_discharge_energy_of_the_battery": SensorEntityDescription(
+        key="remaining_available_discharge_energy_of_the_battery",
+        name="Remaining available discharge energy",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.ENERGY,
+        entity_registry_enabled_default=False,
+    ),
+    "remaining_available_charging_energy_of_the_battery": SensorEntityDescription(
+        key="remaining_available_charging_energy_of_the_battery",
+        name="Remaining available charging energy",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.ENERGY,
+        entity_registry_enabled_default=False,
+    )
+
 }
 
 
