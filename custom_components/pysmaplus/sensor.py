@@ -974,7 +974,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "remaining_available_discharge_energy_of_the_battery": SensorEntityDescription(
         key="remaining_available_discharge_energy_of_the_battery",
         name="Remaining available discharge energy",
-        native_unit_of_measurement=UnitOfPower.KILO_WATT_HOUR,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.ENERGY,
         entity_registry_enabled_default=False,
@@ -982,7 +982,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
     "remaining_available_charging_energy_of_the_battery": SensorEntityDescription(
         key="remaining_available_charging_energy_of_the_battery",
         name="Remaining available charging energy",
-        native_unit_of_measurement=UnitOfPower.KILO_WATT_HOUR,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.ENERGY,
         entity_registry_enabled_default=False,
