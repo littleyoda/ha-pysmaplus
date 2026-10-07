@@ -89,6 +89,8 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
         addrs = []
         adapters = await network.async_get_adapters(hass)
         for adapter in adapters:
+            if not adapter["enabled"]:
+                continue
             for ip_info in adapter["ipv4"]:
                 addrs.append(ip_info["address"])
         _LOGGER.info("Binding Addr: " + ",".join(addrs))
