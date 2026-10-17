@@ -986,7 +986,31 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.ENERGY,
         entity_registry_enabled_default=False,
-    )
+    ),
+    "backup_current_l1": SensorEntityDescription(
+        key="backup_current_l1",
+        name="Backup (Ongrid) Current L1",
+        suggested_display_precision=1,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    "backup_current_l2": SensorEntityDescription(
+        key="backup_current_l2",
+        name="Backup (Ongrid) Current L2",
+        suggested_display_precision=1,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    ),
+    "backup_current_l3": SensorEntityDescription(
+        key="backup_current_l3",
+        name="Backup (Ongrid) Current L3",
+        suggested_display_precision=1,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.CURRENT,
+    )    
 
 }
 
