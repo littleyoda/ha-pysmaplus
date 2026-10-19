@@ -114,6 +114,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except (
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,
+        pysma.exceptions.SmaMulticastReceiveException,
         TimeoutError,
     ) as exc:
         raise ConfigEntryNotReady from exc
