@@ -5,8 +5,15 @@ What you can check:
 * You could try the following add-on as a countercheck:
     https://github.com/kellerza/hassio-sma-em
 * Check whether the SHM2 is set to multicast and not to unicast:
-    Sunny Portal -- Configuration -- Device overview -- Parameters of the SHM2 ---Properties -- Edit
+  
+    Sunny Portal → Configuration → Device overview → Parameters of the SHM2 → Properties → Edit
     The Unicast fields must be empty.
+
+* Multi-NIC or VLAN Setups
+
+    check Settings → System → Network → Network adapter in Home Assistant.
+    Make sure the network interface connected to your SMA devices is enabled. On multi-NIC or VLAN setups, you may need to disable automatic adapter configuration and manually select the required interfaces. Restart Home Assistant after changing these settings.
+    see also https://github.com/littleyoda/ha-pysmaplus/issues/149
 
 
 Three problem clusters have been observed so far:
