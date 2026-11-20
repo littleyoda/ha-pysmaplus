@@ -933,7 +933,6 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         name="Power Limit (IO)",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
     ),
     "operating_mode_plant_control": SensorEntityDescription(
         key="operating_mode_plant_control",
