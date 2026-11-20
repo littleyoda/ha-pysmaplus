@@ -134,7 +134,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 ),
             ]
 
-            sensor_def.add(backup_sensors)        
+            sensor_def.add(backup_sensors)
     except (
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,

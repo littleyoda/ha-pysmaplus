@@ -1012,7 +1012,7 @@ SENSOR_ENTITIES: dict[str, SensorEntityDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
-    )    
+    )
 
 }
 
