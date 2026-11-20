@@ -111,6 +111,30 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sma_device_info = device_list[entry.data[CONF_DEVICE]]
         # Get all device sensors
         sensor_def = await sma.get_sensors(entry.data[CONF_DEVICE])
+        # Additional Sunny Tripower Smart Energy Backup (Ongrid) currents
+        if entry.data[CONF_ACCESS] == "webconnect":
+            backup_sensors = [
+                pysma.sensor.Sensor(
+                    "6100_40574600",
+                    "backup_current_l1",
+                    unit="A",
+                    factor=1000,
+                ),
+                pysma.sensor.Sensor(
+                    "6100_40574700",
+                    "backup_current_l2",
+                    unit="A",
+                    factor=1000,
+                ),
+                pysma.sensor.Sensor(
+                    "6100_40574800",
+                    "backup_current_l3",
+                    unit="A",
+                    factor=1000,
+                ),
+            ]
+
+            sensor_def.add(backup_sensors)        
     except (
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,
