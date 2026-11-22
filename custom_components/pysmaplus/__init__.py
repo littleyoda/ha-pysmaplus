@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import time
 from typing import TYPE_CHECKING, Any
 import pysmaplus as pysma
 from pysmaplus import Device
@@ -137,9 +138,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sw_version=sma_device_info.sw_version,
     )
 
+    interval = timedelta(
+        seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
+    )
+
+    # Failure backoff: every read() performs a full Speedwire login/query/
+    # logoff cycle, and some devices (e.g. older Sunny Boy inverters) stop
+    # answering when polled while unreachable. After consecutive failures,
+    # skip polls for an exponentially growing window (capped) instead of
+    # hammering the device every scan interval. Skipped polls raise
+    # UpdateFailed without touching the device, so entities stay honestly
+    # unavailable and no per-tick warning is logged.
+    max_backoff = timedelta(minutes=15).total_seconds()
+    consecutive_failures = 0
+    skip_until = 0.0
+
     # Define the coordinator
     async def async_update_data():
         """Update the used SMA sensors."""
+        nonlocal consecutive_failures, skip_until
+        if time.monotonic() < skip_until:
+            raise UpdateFailed("pysmaplus update in failure backoff")
         try:
             _LOGGER.info(f"Update pysma {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
             await sma.read(sensor_def, entry.data[CONF_DEVICE])
@@ -149,17 +168,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             pysma.exceptions.SmaConnectionException,
             TimeoutError
         ) as exc:
-            _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
+            consecutive_failures += 1
+            delay = min(
+                interval.total_seconds() * (2 ** (consecutive_failures - 1)),
+                max_backoff,
+            )
+            skip_until = time.monotonic() + delay
+            _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]} — {consecutive_failures} consecutive failure(s), retrying in {delay:.0f}s")
             _LOGGER.warning(exc, exc_info=True)
             raise UpdateFailed(exc) from exc
         except Exception as e:
             _LOGGER.warning(f"Update Failed. Unfetched Exception {type(e)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
-
-
-
-    interval = timedelta(
-        seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
-    )
+        else:
+            if consecutive_failures:
+                _LOGGER.info(
+                    "pysmaplus: recovered after %d consecutive failure(s)",
+                    consecutive_failures,
+                )
+            consecutive_failures = 0
+            skip_until = 0.0
 
     coordinator = DataUpdateCoordinator(
         hass,
