@@ -55,7 +55,9 @@ def load_update_callback(device, access="ennexos", scan_interval=SCAN_INTERVAL):
         "_LOGGER": logging.getLogger("test.pysmaplus.coordinator"),
         "UpdateFailed": UpdateFailed,
         "interval": timedelta(seconds=scan_interval),
-        "max_backoff": MAX_BACKOFF,
+        # Mirrors max_backoff in async_setup_entry: 15 min, or the scan
+        # interval when that is longer.
+        "max_backoff": max(MAX_BACKOFF, float(scan_interval)),
         "backoff": backoff,
     }
     exec(
@@ -128,8 +130,15 @@ class FailureBackoffTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(backoff["failures"], 3)
 
         device.read = AsyncMock(return_value=True)
-        with self.assertLogs("test.pysmaplus.coordinator", level="INFO"):
+        with self.assertLogs("test.pysmaplus.coordinator", level="INFO") as logs:
             self.assertIsNone(await update())
+        self.assertTrue(
+            any(
+                "test-inverter/speedwireinv/IGULD:SELF: recovered after 3 consecutive failure(s)"
+                in line
+                for line in logs.output
+            )
+        )
         self.assertEqual(backoff["failures"], 0)
         self.assertEqual(backoff["delay"], SCAN_INTERVAL)
 
@@ -138,6 +147,22 @@ class FailureBackoffTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(UpdateFailed) as caught:
                 await update()
         self.assertEqual(caught.exception.retry_after, SCAN_INTERVAL)
+
+    async def test_backoff_never_retries_faster_than_the_scan_interval(self):
+        # A scan interval above the 15 minute cap must not shrink the retry
+        # delay below the normal polling cadence during failures.
+        error = pysma.exceptions.SmaConnectionException("No Response from Device")
+        device = SimpleNamespace(read=AsyncMock(side_effect=error))
+        update, backoff = load_update_callback(
+            device, access="speedwireinv", scan_interval=1800
+        )
+        with self.assertLogs("test.pysmaplus.coordinator", level="WARNING"):
+            for _ in range(3):
+                with self.assertRaises(UpdateFailed) as caught:
+                    await update()
+                self.assertEqual(caught.exception.retry_after, 1800)
+        self.assertEqual(backoff["failures"], 3)
+        self.assertEqual(backoff["delay"], 1800)
 
     async def test_backoff_survives_more_failures_than_the_old_exponent_overflow(self):
         error = pysma.exceptions.SmaConnectionException("No Response from Device")

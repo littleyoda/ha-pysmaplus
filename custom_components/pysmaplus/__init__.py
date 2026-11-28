@@ -145,11 +145,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # a full Speedwire login/query/logoff cycle, and some devices (e.g. older
     # Sunny Boy inverters) stop answering when polled while unreachable. After
     # consecutive failures the coordinator is asked to wait an exponentially
-    # growing delay (capped at 15 min) before the next refresh instead of
-    # polling every scan interval. Other access methods keep the regular
-    # polling behaviour - e.g. Energy Meter/SHM2 receives multicast passively
-    # and never performs these login cycles.
-    max_backoff = timedelta(minutes=15).total_seconds()
+    # growing delay (capped at 15 min, or the scan interval if that is longer)
+    # before the next refresh instead of polling every scan interval. Other
+    # access methods keep the regular polling behaviour - e.g. Energy
+    # Meter/SHM2 receives multicast passively and never performs these login
+    # cycles.
+    max_backoff = max(
+        timedelta(minutes=15).total_seconds(), interval.total_seconds()
+    )
     backoff = {"failures": 0, "delay": interval.total_seconds()}
 
     # Define the coordinator
@@ -174,13 +177,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             else:
                 _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
             _LOGGER.warning(exc, exc_info=True)
+            if retry_after is None:
+                raise UpdateFailed(exc) from exc
             raise UpdateFailed(exc, retry_after=retry_after) from exc
         except Exception as e:
             _LOGGER.warning(f"Update Failed. Unfetched Exception {type(e)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
         else:
             if backoff["failures"]:
                 _LOGGER.info(
-                    "pysmaplus: recovered after %d consecutive failure(s)",
+                    "pysmaplus %s/%s/%s: recovered after %d consecutive failure(s)",
+                    entry.data[CONF_HOST],
+                    entry.data[CONF_ACCESS],
+                    entry.data[CONF_DEVICE],
                     backoff["failures"],
                 )
             backoff["failures"] = 0
