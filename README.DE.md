@@ -20,6 +20,17 @@ Der SHM2 und die Engerymeter übermittelt von sich aus die Daten per Multicast i
 
 Geräte: Energymeter + Sunny Home Manager 2
 
+## Optionaler Override (configuration.yaml)
+
+Mit folgender globaler Einstellung lässt sich die Auswahl der Netzwerkschnittstellen durch Home Assistant für Energy Meter / Sunny Home Manager 2 (`speedwireem`) umgehen:
+
+```yaml
+pysmaplus:
+  energy_meter_bind_to_all_interfaces: true
+```
+
+Dadurch wird die Option `bindingaddr` nicht gesetzt und die Bibliothek verwendet ihre Standardbindung an alle Interfaces. Die Einstellung gilt für alle Energy-Meter-/SHM2-Multicast-Verbindungen, auch beim Hinzufügen neuer Geräte. Nach einer Änderung muss Home Assistant neu gestartet werden. Ohne diese Einstellung oder mit `false` werden weiterhin nur die in Home Assistant aktivierten Netzwerkschnittstellen verwendet.
+
 
 # Speedwire
 Fast alle(?) SMA Geräte unterstützen standardmäßig die Kommunikation per Speedwire. Dieses Protokoll ist aber nicht offen gelegt und ein paar Personen haben versucht, zumindest die unverschlüsselte Version des Protokolls zu dekodieren.

@@ -85,6 +85,7 @@ def load_setup_functions():
         "timedelta": timedelta,
         "DOMAIN": "pysmaplus",
         "CONF_ACCESS": "access",
+        "CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES": "energy_meter_bind_to_all_interfaces",
         "CONF_DEVICE": "device",
         "CONF_GROUP": "group",
         "CONF_HOST": "host",
@@ -179,7 +180,7 @@ class SpeedwireEMSetupTests(unittest.IsolatedAsyncioTestCase):
     async def test_no_multicast_packet_is_not_ready(self):
         setup = load_setup_functions()
         with self.assertRaises(ConfigEntryNotReady) as caught:
-            await setup(object(), speedwireem_entry())
+            await setup(SimpleNamespace(data={}), speedwireem_entry())
         self.assertIsInstance(
             caught.exception.__cause__, pysma.exceptions.SmaMulticastReceiveException
         )
@@ -193,7 +194,7 @@ class SpeedwireEMSetupTests(unittest.IsolatedAsyncioTestCase):
         sender = asyncio.create_task(send_shm2_packets(self.loopback))
         try:
             with self.assertRaises(ReachedCoordinator):
-                await setup(object(), speedwireem_entry(str(serial)))
+                await setup(SimpleNamespace(data={}), speedwireem_entry(str(serial)))
         finally:
             sender.cancel()
             with contextlib.suppress(asyncio.CancelledError):

@@ -16,6 +16,7 @@ PLATFORMS = [Platform.SENSOR]
 
 CONF_GROUP = "group"
 CONF_ACCESS = "access"
+CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES = "energy_meter_bind_to_all_interfaces"
 CONF_ACCESSLONG = "accesslong"
 CONF_DISCOVERY = "discovery"
 CONF_DEVICE = "device"

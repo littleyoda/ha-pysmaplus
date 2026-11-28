@@ -25,4 +25,15 @@ Please see also the [Frequently Asked Questions](https://github.com/littleyoda/h
 
 The Speedwire option does not work with every inverter.
 
+# Optional global settings (configuration.yaml)
+
+To bypass Home Assistant's network adapter selection for Energy Meter / Sunny Home Manager 2 multicast connections (`speedwireem`), add:
+
+```yaml
+pysmaplus:
+  energy_meter_bind_to_all_interfaces: true
+```
+
+This omits the `bindingaddr` option and uses the library's default binding to all interfaces. The setting applies to all Energy Meter / SHM2 multicast connections, including when adding devices. Restart Home Assistant after changing it. If omitted or set to `false`, only network adapters enabled in Home Assistant are used.
+
 

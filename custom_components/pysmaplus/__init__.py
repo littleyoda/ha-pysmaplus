@@ -6,6 +6,7 @@ from datetime import timedelta
 import logging
 from typing import TYPE_CHECKING, Any
 import pysmaplus as pysma
+import voluptuous as vol
 from pysmaplus import Device
 from homeassistant.components import network
 
@@ -21,13 +22,16 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from .services import setup_services
 
 from .const import (
     CONF_GROUP,
     CONF_ACCESS,
+    CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES,
     CONF_SCAN_INTERVAL,
     CONF_DEVICE,
     CONF_RETRIES,
@@ -44,6 +48,22 @@ from .const import (
 
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema(
+            {vol.Optional(CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES, default=False): cv.boolean}
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up global options from configuration.yaml."""
+    conf = config.get(DOMAIN) or {}
+    hass.data.setdefault(DOMAIN, {})[CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES] = conf.get(CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES, False)
+    return True
 
 
 async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
@@ -85,7 +105,7 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
             sma.set_options({"loginRetries": retries})
 
     # Adding Bindingaddresses for energy meter multicast
-    if am == "speedwireem":
+    if am == "speedwireem" and not hass.data.get(DOMAIN, {}).get(CONF_ENERGY_METER_BIND_TO_ALL_INTERFACES, False):
         addrs = []
         adapters = await network.async_get_adapters(hass)
         for adapter in adapters:

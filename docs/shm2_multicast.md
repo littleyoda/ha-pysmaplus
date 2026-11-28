@@ -28,3 +28,14 @@ Possible solutions:
 * (Expert) Configure Docker appropriately
 * (Expert) Use the SHM-Grid Code Interface.<br>However, I do not recommend it, as it provides significantly less information than the multicast variant.
 * (Expert) Switch from multicast to unicast.<br>It must be ensured that every device that requires the information from the EM/SHM2 appears in the list. If more than 3 devices (including Home Assistant) require the information, this path is not possible.
+
+## Last resort: bind to all interfaces
+
+Only use this override as a last resort if the checks above have not resolved the issue. First disable automatic adapter configuration under Settings → System → Network → Network adapter, manually select the interfaces connected to your SMA devices, and restart Home Assistant. If multicast reception still fails after this manual selection, add the following to `configuration.yaml`:
+
+```yaml
+pysmaplus:
+  energy_meter_bind_to_all_interfaces: true
+```
+
+Restart Home Assistant afterwards. This bypasses Home Assistant's adapter selection and uses the library's default binding to all interfaces for all Energy Meter / SHM2 multicast connections. Remove the option or set it to `false` to use Home Assistant's selected adapters again, then restart Home Assistant.
