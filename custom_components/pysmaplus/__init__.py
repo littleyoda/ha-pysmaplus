@@ -157,6 +157,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sw_version=sma_device_info.sw_version,
     )
 
+    interval = timedelta(
+        seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
+    )
+
+    # Failure backoff for the Speedwire access methods: every read() performs
+    # a full Speedwire login/query/logoff cycle, and some devices (e.g. older
+    # Sunny Boy inverters) stop answering when polled while unreachable. After
+    # consecutive failures the coordinator is asked to wait an exponentially
+    # growing delay (capped at 15 min, or the scan interval if that is longer)
+    # before the next refresh instead of polling every scan interval. Other
+    # access methods keep the regular polling behaviour - e.g. Energy
+    # Meter/SHM2 receives multicast passively and never performs these login
+    # cycles.
+    max_backoff = max(
+        timedelta(minutes=15).total_seconds(), interval.total_seconds()
+    )
+    backoff = {"failures": 0, "delay": interval.total_seconds()}
+
     # Define the coordinator
     async def async_update_data():
         """Update the used SMA sensors."""
@@ -169,17 +187,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             pysma.exceptions.SmaConnectionException,
             TimeoutError
         ) as exc:
-            _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
+            retry_after = None
+            if entry.data[CONF_ACCESS] in ("speedwireinv", "speedwireinvV2"):
+                backoff["failures"] += 1
+                delay = backoff["delay"]
+                backoff["delay"] = min(delay * 2, max_backoff)
+                retry_after = delay
+                _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]} — {backoff['failures']} consecutive failure(s), retrying in {delay:.0f}s")
+            else:
+                _LOGGER.warning(f"Update Failed {type(exc)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
             _LOGGER.warning(exc, exc_info=True)
-            raise UpdateFailed(exc) from exc
+            if retry_after is None:
+                raise UpdateFailed(exc) from exc
+            raise UpdateFailed(exc, retry_after=retry_after) from exc
         except Exception as e:
             _LOGGER.warning(f"Update Failed. Unfetched Exception {type(e)} {entry.data[CONF_HOST]}/{entry.data[CONF_ACCESS]}/{entry.data[CONF_DEVICE]}")
-
-
-
-    interval = timedelta(
-        seconds=entry.options.get(CONF_SCAN_INTERVAL, entry.data[CONF_SCAN_INTERVAL])
-    )
+        else:
+            if backoff["failures"]:
+                _LOGGER.info(
+                    "pysmaplus %s/%s/%s: recovered after %d consecutive failure(s)",
+                    entry.data[CONF_HOST],
+                    entry.data[CONF_ACCESS],
+                    entry.data[CONF_DEVICE],
+                    backoff["failures"],
+                )
+            backoff["failures"] = 0
+            backoff["delay"] = interval.total_seconds()
 
     coordinator = DataUpdateCoordinator(
         hass,
