@@ -115,28 +115,39 @@ async def getPysmaInstance(hass: HomeAssistant, data: dict[str, Any]) -> Device:
                 addrs.append(ip_info["address"])
         _LOGGER.info("Binding Addr: " + ",".join(addrs))
         sma.set_options({"bindingaddr": ",".join(addrs)})
-    await sma.new_session()
+    try:
+        await sma.new_session()
+    except Exception:
+        # Do not leave a half-opened session behind (e.g. a scheduled
+        # ennexOS token refresh) when the login fails.
+        await sma.close_session()
+        raise
     return sma
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sma from a config entry."""
+    sma = None
     try:
-        # Init the SMA interface (getPysmaInstance already opens a session)
+        # Init the SMA interface. getPysmaInstance already opens the session;
+        # a second new_session() here would only send another login request.
         sma = await getPysmaInstance(hass, entry.data)
-        # Start seession/Test connection
-        await sma.new_session()
         # Get updated device info
         device_list = await sma.device_list()
         sma_device_info = device_list[entry.data[CONF_DEVICE]]
         # Get all device sensors
         sensor_def = await sma.get_sensors(entry.data[CONF_DEVICE])
     except (
+        pysma.exceptions.SmaAuthenticationException,
         pysma.exceptions.SmaReadException,
         pysma.exceptions.SmaConnectionException,
         pysma.exceptions.SmaMulticastReceiveException,
         TimeoutError,
     ) as exc:
+        # A failed login right after a reboot of HA or the device is usually
+        # transient, so let Home Assistant retry instead of ending in setup_error.
+        if sma is not None:
+            await sma.close_session()
         raise ConfigEntryNotReady from exc
 
     if TYPE_CHECKING:
